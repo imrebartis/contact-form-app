@@ -1,0 +1,10 @@
+*.html
+*.md
+*.css
+*.yml
+*.json
+*.yaml
+.babelrc
+.prettierrc
+node_modules
+dist

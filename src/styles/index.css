@@ -1,0 +1,328 @@
+/* 1. Use a more-intuitive box-sizing model */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margin */
+* {
+  margin: 0;
+}
+
+body {
+  /* 3. Add accessible line-height */
+  line-height: 1.5;
+  /* 4. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 5. Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+}
+
+/* 6. Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* 7. Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* 8. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+/* 9. Create a root stacking context */
+#root,
+#__next {
+  isolation: isolate;
+}
+
+@font-face {
+  font-family: Karla;
+  src: url("../assets/fonts/static/Karla-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: Karla;
+  src: url("../assets/fonts/static/Karla-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+body {
+  min-height: 100vh;
+  font-family: "Karla", sans-serif;
+  line-height: 1.6;
+  background-color: hsl(0, 0%, 96%);
+  color: hsl(0, 0%, 20%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 46rem;
+  padding: 16px;
+}
+
+.contact-form {
+  position: relative;
+  padding: 32px;
+  background: hsl(0, 0%, 100%);
+  border-radius: 8px;
+  box-shadow: 0 0.625rem 1.875rem rgba(42.636, 66.4224, 69.564, 0.1);
+}
+.contact-form h1 {
+  margin-bottom: 32px;
+  font-size: 2rem;
+  text-align: center;
+  color: hsl(187, 24%, 22%);
+}
+.contact-form .form-group {
+  position: relative;
+  margin-bottom: 1.25rem;
+}
+.contact-form input[type=text],
+.contact-form input[type=email],
+.contact-form textarea {
+  padding: 12px;
+  border: 2px solid hsl(186, 15%, 59%);
+  border-radius: 4px;
+  font-family: "Karla", sans-serif;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.contact-form input[type=text]:focus,
+.contact-form input[type=email]:focus,
+.contact-form textarea:focus {
+  border-color: hsl(169, 82%, 27%);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(223.329, 240.771, 231.4686, 0.5);
+}
+.contact-form input[type=text],
+.contact-form input[type=email],
+.contact-form textarea {
+  width: 100%;
+}
+.contact-form input[type=text].error,
+.contact-form input[type=email].error,
+.contact-form textarea.error {
+  border-color: hsl(0, 66%, 54%);
+}
+.contact-form input[type=checkbox] {
+  padding: 12px;
+  border: 2px solid hsl(186, 15%, 59%);
+  border-radius: 4px;
+  font-family: "Karla", sans-serif;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.contact-form input[type=checkbox]:focus {
+  border-color: hsl(169, 82%, 27%);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(223.329, 240.771, 231.4686, 0.5);
+}
+.contact-form textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+}
+.contact-form .error-message {
+  position: absolute;
+  bottom: -1.25rem;
+  left: 0;
+  font-size: 0.875rem;
+  color: hsl(0, 66%, 54%);
+}
+.contact-form button {
+  padding: 12px;
+  border: 2px solid hsl(186, 15%, 59%);
+  border-radius: 4px;
+  font-family: "Karla", sans-serif;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  /* stylelint-disable-next-line no-duplicate-selectors */
+}
+.contact-form button:focus {
+  border-color: hsl(169, 82%, 27%);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(223.329, 240.771, 231.4686, 0.5);
+}
+.contact-form button {
+  width: 100%;
+}
+.contact-form button {
+  margin-top: 16px;
+  font-weight: 700;
+  background-color: hsl(169, 82%, 27%);
+  color: hsl(0, 0%, 100%);
+  cursor: pointer;
+}
+.contact-form button:hover {
+  transform: translateY(-1px);
+  background-color: hsl(169, 82%, 22%);
+}
+.contact-form button:disabled {
+  background-color: hsl(187, 24%, 22%);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.contact-form .checkbox-wrapper .error-message {
+  position: absolute;
+  bottom: -1.25rem;
+  left: 0;
+  display: none;
+  font-size: 0.875rem;
+  color: hsl(0, 66%, 54%);
+}
+.contact-form .success-message {
+  margin-top: 16px;
+  padding: 16px;
+  text-align: center;
+  background-color: hsl(148, 38%, 91%);
+  border-radius: 4px;
+  color: hsl(187, 24%, 22%);
+  animation: fade-in 0.3s ease;
+}
+
+.radio-group {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.radio-group legend {
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: hsl(0, 0%, 20%);
+}
+
+.radio-option {
+  position: relative;
+  margin-bottom: 8px;
+  padding: 12px;
+  border: 0.125rem solid hsl(186, 15%, 59%);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.radio-option:hover {
+  border-color: hsl(169, 82%, 27%);
+}
+.radio-option label {
+  position: relative;
+  display: block;
+  padding-left: 24px;
+  cursor: pointer;
+}
+.radio-option label::before {
+  position: absolute;
+  top: 50%;
+  left: 0.125rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  content: "";
+  transform: translateY(-50%);
+  border: 0.125rem solid hsl(186, 15%, 59%);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+.radio-option label::after {
+  position: absolute;
+  top: 50%;
+  left: 0.375rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  content: "";
+  transform: translateY(-50%);
+  background: hsl(169, 82%, 27%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.radio-option input[type=radio] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0;
+}
+.radio-option input[type=radio]:checked + label {
+  color: hsl(169, 82%, 27%);
+}
+.radio-option input[type=radio]:checked ~ .radio-option {
+  border-color: hsl(169, 82%, 27%);
+}
+.radio-option input[type=radio]:focus + label {
+  outline: 0.125rem solid hsl(169, 82%, 27%);
+  outline-offset: 0.125rem;
+}
+.radio-option input[type=radio]:checked + label::before {
+  border-color: hsl(169, 82%, 27%);
+}
+.radio-option input[type=radio]:checked + label::after {
+  opacity: 1;
+}
+
+.required {
+  color: hsl(169, 82%, 27%);
+}
+
+.toast-success .toastify-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0 8px 0 0;
+}
+.toast-success .toastify-avatar path {
+  color: hsl(148, 38%, 91%);
+}
+
+@keyframes fade-in {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@media (width <= 768px) {
+  .container {
+    padding: 8px;
+  }
+  .contact-form {
+    padding: 16px;
+  }
+}

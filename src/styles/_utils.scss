@@ -1,0 +1,6 @@
+@use 'sass:math' as math;
+@use 'variables';
+@use 'functions';
+
+// Re-export functions module
+@forward 'functions';

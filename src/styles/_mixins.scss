@@ -1,0 +1,48 @@
+@use 'variables' as *;
+@use 'sass:color' as color;
+@use 'utils';
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin input-focus {
+  border-color: $primary-color;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba($green-200, 0.5);
+}
+
+@mixin button-hover {
+  transform: translateY(-1px);
+  background-color: color.adjust($primary-color, $lightness: -5%);
+}
+
+@mixin base-form-element {
+  padding: $spacing-unit * 1.5;
+  border: 2px solid $grey-500;
+  border-radius: $border-radius;
+  font-family: $font-family;
+  font-size: $font-size-base;
+  transition: all $transition-duration ease;
+
+  &:focus {
+    @include input-focus;
+  }
+}
+
+@mixin full-width-form-element {
+  @include base-form-element;
+
+  & {
+    width: 100%;
+  }
+}
+
+@mixin checkbox-element {
+  & {
+    @include base-form-element;
+    cursor: pointer;
+  }
+}
