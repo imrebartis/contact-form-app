@@ -1,5 +1,6 @@
 {
-  "name": "vite-typescript-starter",
+  "name": "contact-form-app",
+  "homepage": "https://imrebartis.github.io/contact-form-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -30,14 +31,15 @@
     ],
     "*.{json,css,scss,md}": [
       "prettier --write"
+    ],
+    "*.scss": [
+      "stylelint --fix"
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.26.9",
-    "@babel/preset-env": "^7.26.9",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.20.0",
-    "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
+    "@ianvs/prettier-plugin-sort-imports": "3.4.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -50,14 +52,14 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-jest": "^28.11.0",
+    "eslint-plugin-import": "^2.31.0",
     "globals": "^16.0.0",
     "happy-dom": "^17.1.1",
     "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
     "jsdom": "^26.0.0",
     "lint-staged": "^15.4.3",
-    "prettier": "^3.5.1",
+    "prettier": "2.8.8",
     "sass": "^1.70.0",
     "stylelint": "^16.14.1",
     "stylelint-config-standard-scss": "^14.0.0",

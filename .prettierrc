@@ -7,24 +7,10 @@
     "@ianvs/prettier-plugin-sort-imports"
   ],
   "importOrder": [
-    "^(react/(.*)$)|^(react$)",
-    "^(next/(.*)$)|^(next$)",
     "<THIRD_PARTY_MODULES>",
-    "",
-    "^types$",
-    "^@/types/(.*)$",
-    "^@/config/(.*)$",
-    "^@/lib/(.*)$",
-    "^@/components/(.*)$",
-    "^@/styles/(.*)$",
-    "^@/(.*)$",
     "",
     "^[./]"
   ],
-  "importOrderParserPlugins": [
-    "typescript",
-    "jsx",
-    "decorators-legacy"
-  ],
-  "importOrderTypeScriptVersion": "5.0.0"
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

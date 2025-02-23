@@ -1,8 +1,9 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
+import importPlugin from 'eslint-plugin-import';
 import globals from 'globals';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,15 +14,10 @@ const compat = new FlatCompat({
 });
 
 export default [
-  ...compat.extends(
-    'eslint:recommended',
-    'plugin:jest/recommended',
-    'prettier'
-  ),
+  ...compat.extends('eslint:recommended', 'prettier'),
   {
     languageOptions: {
       globals: {
-        ...globals.jest,
         ...globals.browser,
         ...globals.node,
         document: 'readonly',
@@ -31,6 +27,9 @@ export default [
       parserOptions: {
         project: './tsconfig.json',
       },
+    },
+    plugins: {
+      import: importPlugin,
     },
     rules: {
       semi: ['error', 'always'],

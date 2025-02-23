@@ -43,6 +43,7 @@
 @mixin checkbox-element {
   & {
     @include base-form-element;
+
     cursor: pointer;
   }
 }
