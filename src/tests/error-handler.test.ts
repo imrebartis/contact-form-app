@@ -44,7 +44,10 @@ describe('ErrorHandler', () => {
 
     it('should handle radio group elements', () => {
       element.classList.add('radio-group');
-      element.setAttribute('aria-describedby', 'error-1');
+
+      const internalErrorElement = document.createElement('div');
+      internalErrorElement.classList.add('error-message');
+      element.appendChild(internalErrorElement);
 
       const radio1 = document.createElement('input');
       radio1.type = 'radio';
@@ -55,15 +58,34 @@ describe('ErrorHandler', () => {
 
       errorHandler.showError(element, 'Radio error message');
 
-      expect(errorElement.textContent).toBe('Radio error message');
+      expect(internalErrorElement.textContent).toBe('Radio error message');
       expect(radio1.getAttribute('aria-invalid')).toBe('true');
       expect(radio2.getAttribute('aria-invalid')).toBe('true');
     });
 
+    it('should handle elements with aria-describedby', () => {
+      element.setAttribute('aria-describedby', 'error-1');
+      errorElement.classList.add('error-message');
+
+      errorHandler.showError(element, 'Test error message');
+
+      expect(errorElement.textContent).toBe('Test error message');
+      expect(errorElement.style.display).toBe('block');
+      expect(element.getAttribute('aria-invalid')).toBe('true');
+    });
+
     it('should handle elements with nested aria-describedby', () => {
-      const nestedElement = document.createElement('div');
-      nestedElement.setAttribute('aria-describedby', 'error-1');
-      element.appendChild(nestedElement);
+      document.body.innerHTML = `
+        <div>
+          <input id="test-input" aria-describedby="error-message" />
+          <div id="error-message" class="error-message"></div>
+        </div>
+      `;
+
+      const element = document.getElementById('test-input') as HTMLInputElement;
+      const errorElement = document.getElementById(
+        'error-message'
+      ) as HTMLElement;
 
       errorHandler.showError(element, 'Nested error message');
 
@@ -72,9 +94,16 @@ describe('ErrorHandler', () => {
     });
 
     it('should handle missing error element gracefully', () => {
-      element.setAttribute('aria-describedby', 'non-existent-id');
+      document.body.innerHTML = `
+        <div>
+          <input id="test-input" />
+        </div>
+      `;
+
+      const element = document.getElementById('test-input') as HTMLInputElement;
+
       expect(() => {
-        errorHandler.showError(element, 'Test message');
+        errorHandler.showError(element, 'Test error');
       }).not.toThrow();
 
       expect(element.getAttribute('aria-invalid')).toBe('true');

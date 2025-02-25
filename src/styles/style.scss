@@ -65,6 +65,11 @@ body {
     left: 0;
     font-size: rem(14px);
     color: $error-color;
+    display: none;
+
+    &.visible {
+      display: block;
+    }
   }
 
   button {
@@ -90,12 +95,11 @@ body {
     }
   }
 
-  .checkbox-wrapper {
+  .checkbox-container {
     .error-message {
       position: absolute;
       bottom: rem(-20px);
       left: 0;
-      display: none;
       font-size: rem(14px);
       color: $error-color;
     }

@@ -162,6 +162,10 @@ body {
   left: 0;
   font-size: 0.875rem;
   color: hsl(0, 66%, 54%);
+  display: none;
+}
+.contact-form .error-message.visible {
+  display: block;
 }
 .contact-form button {
   padding: 12px;
@@ -196,11 +200,10 @@ body {
   opacity: 0.7;
   cursor: not-allowed;
 }
-.contact-form .checkbox-wrapper .error-message {
+.contact-form .checkbox-container .error-message {
   position: absolute;
   bottom: -1.25rem;
   left: 0;
-  display: none;
   font-size: 0.875rem;
   color: hsl(0, 66%, 54%);
 }

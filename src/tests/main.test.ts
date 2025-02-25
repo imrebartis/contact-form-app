@@ -4,8 +4,6 @@ import { ContactForm } from '../main';
 import { FormRenderer } from '../services/form-renderer';
 
 describe('ContactForm', () => {
-  // @ts-expect-error
-  let form: ContactForm;
   let formElement: HTMLFormElement;
 
   beforeEach(() => {
@@ -13,7 +11,7 @@ describe('ContactForm', () => {
     const renderer = new FormRenderer();
     formElement = renderer.renderForm();
     document.body.appendChild(formElement);
-    form = new ContactForm();
+    new ContactForm();
   });
 
   it('should display validation errors on empty form submission', () => {
@@ -24,18 +22,26 @@ describe('ContactForm', () => {
   });
 
   it('should validate fields as user types', () => {
+    const contactForm = new ContactForm();
+    contactForm.init();
+
     const firstNameInput = document.getElementById(
       'first-name'
     ) as HTMLInputElement;
-    firstNameInput.value = 'J';
-    firstNameInput.dispatchEvent(new Event('input'));
+    firstNameInput.blur();
 
-    const errorMessage = firstNameInput.nextElementSibling;
+    const errorMessage = firstNameInput.nextElementSibling as HTMLElement;
+
     expect(errorMessage?.textContent).toBe('This field is required');
+    expect(errorMessage?.style.display).toBe('block');
 
     firstNameInput.value = 'John';
-    firstNameInput.dispatchEvent(new Event('input'));
+
+    const inputEvent = new Event('input');
+    firstNameInput.dispatchEvent(inputEvent);
+
     expect(errorMessage?.textContent).toBe('');
+    expect(errorMessage?.style.display).toBe('none');
   });
 
   it('should prevent multiple submissions', () => {

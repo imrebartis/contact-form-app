@@ -5,6 +5,7 @@ import { FormRenderer } from './services/form-renderer';
 import { FormValidator } from './services/form-validator';
 import { ToastService } from './services/toast-service';
 import { FormData, FormElements } from './types/form.types';
+import { DOMUtils } from './utils/dom-utils';
 
 import './styles/style.scss';
 
@@ -12,18 +13,23 @@ export class ContactForm {
   private form!: HTMLFormElement;
   private elements!: FormElements;
   private submitButton!: HTMLButtonElement;
-  private validator!: FormValidator;
-  private toastService!: ToastService;
-  private errorHandler!: ErrorHandler;
+  private validator: FormValidator;
+  private toastService: ToastService;
+  private errorHandler: ErrorHandler;
+  private formRenderer: FormRenderer;
 
   constructor() {
-    const renderer = new FormRenderer();
-    this.form = renderer.renderForm();
-    this.setupElements();
     this.validator = new FormValidator();
     this.toastService = new ToastService();
     this.errorHandler = new ErrorHandler();
+    this.formRenderer = new FormRenderer();
+  }
+
+  init(): void {
+    this.form = this.formRenderer.renderForm();
+    this.setupElements();
     this.setupEventListeners();
+    this.setInitialFocus();
   }
 
   private setupElements(): void {
@@ -39,27 +45,37 @@ export class ContactForm {
   }
 
   private setupEventListeners(): void {
-    this.form.addEventListener('submit', this.handleSubmit.bind(this));
+    DOMUtils.addEventListener(
+      this.form,
+      'submit',
+      this.handleSubmit.bind(this)
+    );
 
     Object.entries(this.elements).forEach(([key, element]) => {
       if (key === 'queryType') {
         const radioButtons = element as RadioNodeList;
         Array.from(radioButtons).forEach((radio) => {
           if (radio instanceof HTMLInputElement) {
-            radio.addEventListener('change', () =>
+            DOMUtils.addEventListener(radio, 'change', () =>
               this.validateField(key as keyof FormElements)
             );
           }
         });
       } else {
-        element.addEventListener('input', () =>
+        DOMUtils.addEventListener(element, 'input', () =>
           this.validateField(key as keyof FormElements)
         );
-        element.addEventListener('blur', () =>
+        DOMUtils.addEventListener(element, 'blur', () =>
           this.validateField(key as keyof FormElements)
         );
       }
     });
+  }
+
+  private setInitialFocus(): void {
+    if (this.elements.firstName) {
+      this.elements.firstName.focus();
+    }
   }
 
   private validateField(fieldName: keyof FormElements): boolean {
@@ -69,10 +85,17 @@ export class ContactForm {
       element as HTMLElement
     );
 
-    const errorContainer =
-      fieldName === 'queryType'
-        ? (document.querySelector('.radio-group') as HTMLElement)
-        : (element as HTMLElement);
+    let errorContainer: HTMLElement;
+
+    if (fieldName === 'queryType') {
+      errorContainer = document.querySelector('.radio-group') as HTMLElement;
+    } else if (fieldName === 'consent') {
+      errorContainer = document.querySelector(
+        '.checkbox-container'
+      ) as HTMLElement;
+    } else {
+      errorContainer = element as HTMLElement;
+    }
 
     this.errorHandler.showError(errorContainer, isValid ? '' : errorMessage);
     return isValid;
@@ -85,46 +108,106 @@ export class ContactForm {
       return;
     }
 
-    const isValid = Object.keys(this.elements).every((key) =>
-      this.validateField(key as keyof FormElements)
-    );
+    const isValid = this.validateAllFields();
 
     if (isValid) {
-      this.submitButton.disabled = true;
-      this.submitButton.textContent = 'Sending...';
-
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        const formData: FormData = {
-          firstName: this.elements.firstName.value,
-          lastName: this.elements.lastName.value,
-          email: this.elements.email.value,
-          queryType: (this.elements.queryType as RadioNodeList).value,
-          message: this.elements.message.value,
-          consent: this.elements.consent.checked,
-        };
-
-        console.log('Form submitted:', formData);
-
-        this.toastService.showSuccess(
-          "Thanks for completing the form. We'll be in touch soon!"
-        );
-        this.form.reset();
-        this.submitButton.textContent = 'Sent';
-        this.submitButton.disabled = true;
-      } catch (error) {
-        this.errorHandler.showError(
-          this.form,
-          'Failed to send message. Please try again.'
-        );
-        this.submitButton.disabled = false;
-        this.submitButton.textContent = 'Submit';
-      }
+      await this.submitForm();
     }
+  }
+
+  private validateAllFields(): boolean {
+    return Object.keys(this.elements).every((key) =>
+      this.validateField(key as keyof FormElements)
+    );
+  }
+
+  private async submitForm(): Promise<void> {
+    this.disableSubmitButton('Sending...');
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const formData: FormData = this.collectFormData();
+      console.log('Form submitted:', formData);
+
+      this.handleSuccessfulSubmission();
+    } catch (error) {
+      this.handleFailedSubmission();
+    }
+  }
+
+  private collectFormData(): FormData {
+    return {
+      firstName: this.elements.firstName.value,
+      lastName: this.elements.lastName.value,
+      email: this.elements.email.value,
+      queryType: (this.elements.queryType as RadioNodeList).value,
+      message: this.elements.message.value,
+      consent: this.elements.consent.checked,
+    };
+  }
+
+  private disableSubmitButton(text: string): void {
+    this.submitButton.disabled = true;
+    this.submitButton.textContent = text;
+  }
+
+  private handleSuccessfulSubmission(): void {
+    this.toastService.showSuccess(
+      "Thanks for completing the form. We'll be in touch soon!"
+    );
+    this.form.reset();
+    this.submitButton.textContent = 'Sent';
+    this.submitButton.disabled = true;
+  }
+
+  private handleFailedSubmission(): void {
+    this.errorHandler.showError(
+      this.form,
+      'Failed to send message. Please try again.'
+    );
+    this.submitButton.disabled = false;
+    this.submitButton.textContent = 'Submit';
+  }
+
+  cleanup(): void {
+    DOMUtils.removeEventListener(
+      this.form,
+      'submit',
+      this.handleSubmit.bind(this)
+    );
+
+    Object.entries(this.elements).forEach(([key, element]) => {
+      if (key === 'queryType') {
+        const radioButtons = element as RadioNodeList;
+        Array.from(radioButtons).forEach((radio) => {
+          if (radio instanceof HTMLInputElement) {
+            DOMUtils.removeEventListener(radio, 'change', () =>
+              this.validateField(key as keyof FormElements)
+            );
+          }
+        });
+      } else {
+        DOMUtils.removeEventListener(element, 'input', () =>
+          this.validateField(key as keyof FormElements)
+        );
+        DOMUtils.removeEventListener(element, 'blur', () =>
+          this.validateField(key as keyof FormElements)
+        );
+      }
+    });
   }
 }
 
+let contactForm: ContactForm;
+
 document.addEventListener('DOMContentLoaded', () => {
-  new ContactForm();
+  contactForm = new ContactForm();
+  contactForm.init();
+});
+
+window.addEventListener('beforeunload', () => {
+  if (contactForm) {
+    contactForm.cleanup();
+  }
 });

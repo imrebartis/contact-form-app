@@ -97,7 +97,7 @@ export class FormRenderer {
           </div>
 
           <div class="form-group">
-            <div class="checkbox-wrapper" role="group">
+            <div class="checkbox-container" role="group">
               <input
                 type="checkbox"
                 id="consent"
