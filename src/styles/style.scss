@@ -45,7 +45,7 @@ body {
   textarea {
     @include mix.full-width-form-element;
 
-    &.error {
+    &[aria-invalid='true'] {
       border-color: $error-color;
     }
   }
@@ -67,7 +67,7 @@ body {
     color: $error-color;
     display: none;
 
-    &.visible {
+    &.error-visible {
       display: block;
     }
   }
@@ -103,16 +103,6 @@ body {
       font-size: rem(14px);
       color: $error-color;
     }
-  }
-
-  .success-message {
-    margin-top: $spacing-unit * 2;
-    padding: $spacing-unit * 2;
-    text-align: center;
-    background-color: $green-200;
-    border-radius: $border-radius;
-    color: $grey-900;
-    animation: fade-in 0.3s ease;
   }
 }
 
@@ -213,15 +203,33 @@ body {
 }
 
 .toast-success {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'avatar title'
+    'content content';
+  gap: rem(4px) $spacing-unit;
+  align-items: start;
+
   .toastify-avatar {
     width: rem(24px);
     height: rem(24px);
-    margin: 0 $spacing-unit 0 0;
-
-    path {
-      color: $green-200;
-    }
+    grid-area: avatar;
+    margin: 0;
   }
+
+  strong {
+    grid-area: title;
+    font-weight: 700;
+  }
+}
+
+.toast-success-wrapper {
+  display: contents;
+}
+
+.toast-success-content {
+  grid-area: content;
 }
 
 @keyframes fade-in {

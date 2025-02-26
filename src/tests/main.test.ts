@@ -33,7 +33,7 @@ describe('ContactForm', () => {
     const errorMessage = firstNameInput.nextElementSibling as HTMLElement;
 
     expect(errorMessage?.textContent).toBe('This field is required');
-    expect(errorMessage?.style.display).toBe('block');
+    expect(errorMessage?.classList.contains('error-visible')).toBe(true);
 
     firstNameInput.value = 'John';
 
@@ -41,7 +41,7 @@ describe('ContactForm', () => {
     firstNameInput.dispatchEvent(inputEvent);
 
     expect(errorMessage?.textContent).toBe('');
-    expect(errorMessage?.style.display).toBe('none');
+    expect(errorMessage?.classList.contains('error-visible')).toBe(false);
   });
 
   it('should prevent multiple submissions', () => {

@@ -70,7 +70,7 @@ describe('ErrorHandler', () => {
       errorHandler.showError(element, 'Test error message');
 
       expect(errorElement.textContent).toBe('Test error message');
-      expect(errorElement.style.display).toBe('block');
+      expect(errorElement.classList.contains('error-visible')).toBe(true);
       expect(element.getAttribute('aria-invalid')).toBe('true');
     });
 
@@ -90,7 +90,7 @@ describe('ErrorHandler', () => {
       errorHandler.showError(element, 'Nested error message');
 
       expect(errorElement.textContent).toBe('Nested error message');
-      expect(errorElement.style.display).toBe('block');
+      expect(errorElement.classList.contains('error-visible')).toBe(true);
     });
 
     it('should handle missing error element gracefully', () => {
@@ -107,6 +107,75 @@ describe('ErrorHandler', () => {
       }).not.toThrow();
 
       expect(element.getAttribute('aria-invalid')).toBe('true');
+    });
+  });
+
+  describe('Error tracking and management', () => {
+    it('should track errors by group', () => {
+      const input1 = document.createElement('input');
+      const input2 = document.createElement('input');
+      const error1 = document.createElement('div');
+      const error2 = document.createElement('div');
+
+      error1.classList.add('error-message');
+      error2.classList.add('error-message');
+
+      input1.setAttribute('aria-describedby', 'error1');
+      input2.setAttribute('aria-describedby', 'error2');
+
+      error1.id = 'error1';
+      error2.id = 'error2';
+
+      document.body.appendChild(input1);
+      document.body.appendChild(input2);
+      document.body.appendChild(error1);
+      document.body.appendChild(error2);
+
+      errorHandler.showError(input1, 'Error in form 1', 'form1');
+      errorHandler.showError(input2, 'Error in form 2', 'form2');
+
+      expect(errorHandler.hasErrors('form1')).toBe(true);
+      expect(errorHandler.hasErrors('form2')).toBe(true);
+      expect(errorHandler.getErrorCount('form1')).toBe(1);
+      expect(errorHandler.getErrorCount('form2')).toBe(1);
+
+      errorHandler.clearErrorGroup('form1');
+
+      expect(errorHandler.hasErrors('form1')).toBe(false);
+      expect(errorHandler.hasErrors('form2')).toBe(true);
+      expect(error1.textContent).toBe('');
+      expect(error2.textContent).toBe('Error in form 2');
+    });
+
+    it('should clear all errors', () => {
+      const input1 = document.createElement('input');
+      const input2 = document.createElement('input');
+      const error1 = document.createElement('div');
+      const error2 = document.createElement('div');
+
+      error1.classList.add('error-message');
+      error2.classList.add('error-message');
+
+      input1.setAttribute('aria-describedby', 'error1');
+      input2.setAttribute('aria-describedby', 'error2');
+
+      error1.id = 'error1';
+      error2.id = 'error2';
+
+      document.body.appendChild(input1);
+      document.body.appendChild(input2);
+      document.body.appendChild(error1);
+      document.body.appendChild(error2);
+
+      errorHandler.showError(input1, 'Error in form 1', 'form1');
+      errorHandler.showError(input2, 'Error in form 2', 'form2');
+
+      errorHandler.clearAllErrors();
+
+      expect(errorHandler.hasErrors('form1')).toBe(false);
+      expect(errorHandler.hasErrors('form2')).toBe(false);
+      expect(error1.textContent).toBe('');
+      expect(error2.textContent).toBe('');
     });
   });
 });

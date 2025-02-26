@@ -55,10 +55,10 @@ export class FormRenderer {
           <div class="form-group">
             <fieldset class="radio-group">
               <legend id="label-legend">
-                <span class="label-text" id="label-text">Query Type&nbsp;</span>
+                <span class="label-text" id="query-type-label">Query Type&nbsp;</span>
                 <span class="required" aria-hidden="true">*</span>
               </legend>
-              <div class="radio-option" id="radio-option-general" role="radio" aria-checked="false">
+              <div class="radio-option" id="radio-option-general">
                 <input
                   type="radio"
                   id="query-general"
@@ -68,7 +68,7 @@ export class FormRenderer {
                 >
                 <label for="query-general">General Enquiry</label>
               </div>
-              <div class="radio-option" id="radio-option-support" role="radio" aria-checked="false">
+              <div class="radio-option" id="radio-option-support">
                 <input
                   type="radio"
                   id="query-support"

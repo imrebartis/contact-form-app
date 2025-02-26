@@ -17,6 +17,8 @@ export class ContactForm {
   private toastService: ToastService;
   private errorHandler: ErrorHandler;
   private formRenderer: FormRenderer;
+  private eventHandlers: Record<string, EventListenerOrEventListenerObject> =
+    {};
 
   constructor() {
     this.validator = new FormValidator();
@@ -45,29 +47,49 @@ export class ContactForm {
   }
 
   private setupEventListeners(): void {
+    this.eventHandlers['form-submit'] = this.handleSubmit.bind(this);
     DOMUtils.addEventListener(
       this.form,
       'submit',
-      this.handleSubmit.bind(this)
+      this.eventHandlers['form-submit']
     );
 
     Object.entries(this.elements).forEach(([key, element]) => {
       if (key === 'queryType') {
         const radioButtons = element as RadioNodeList;
-        Array.from(radioButtons).forEach((radio) => {
+        Array.from(radioButtons).forEach((radio, index) => {
           if (radio instanceof HTMLInputElement) {
-            DOMUtils.addEventListener(radio, 'change', () =>
-              this.validateField(key as keyof FormElements)
+            const handlerKey = `${key}-change-${index}`;
+            this.eventHandlers[handlerKey] = this.validateField.bind(
+              this,
+              key as keyof FormElements
+            );
+            DOMUtils.addEventListener(
+              radio,
+              'change',
+              this.eventHandlers[handlerKey]
             );
           }
         });
       } else {
-        DOMUtils.addEventListener(element, 'input', () =>
-          this.validateField(key as keyof FormElements)
+        const inputKey = `${key}-input`;
+        const blurKey = `${key}-blur`;
+
+        this.eventHandlers[inputKey] = this.validateField.bind(
+          this,
+          key as keyof FormElements
         );
-        DOMUtils.addEventListener(element, 'blur', () =>
-          this.validateField(key as keyof FormElements)
+        this.eventHandlers[blurKey] = this.validateField.bind(
+          this,
+          key as keyof FormElements
         );
+
+        DOMUtils.addEventListener(
+          element,
+          'input',
+          this.eventHandlers[inputKey]
+        );
+        DOMUtils.addEventListener(element, 'blur', this.eventHandlers[blurKey]);
       }
     });
   }
@@ -153,9 +175,14 @@ export class ContactForm {
   }
 
   private handleSuccessfulSubmission(): void {
-    this.toastService.showSuccess(
-      "Thanks for completing the form. We'll be in touch soon!"
-    );
+    this.toastService.showSuccess(`
+      <div class="toast-success-wrapper">
+        <strong>Message Sent!</strong>
+        <div class="toast-success-content">
+          Thanks for completing the form. We'll be in touch soon!
+        </div>
+    </div>
+    `);
     this.form.reset();
     this.submitButton.textContent = 'Sent';
     this.submitButton.disabled = true;
@@ -174,25 +201,35 @@ export class ContactForm {
     DOMUtils.removeEventListener(
       this.form,
       'submit',
-      this.handleSubmit.bind(this)
+      this.eventHandlers['form-submit']
     );
 
     Object.entries(this.elements).forEach(([key, element]) => {
       if (key === 'queryType') {
         const radioButtons = element as RadioNodeList;
-        Array.from(radioButtons).forEach((radio) => {
+        Array.from(radioButtons).forEach((radio, index) => {
           if (radio instanceof HTMLInputElement) {
-            DOMUtils.removeEventListener(radio, 'change', () =>
-              this.validateField(key as keyof FormElements)
+            const handlerKey = `${key}-change-${index}`;
+            DOMUtils.removeEventListener(
+              radio,
+              'change',
+              this.eventHandlers[handlerKey]
             );
           }
         });
       } else {
-        DOMUtils.removeEventListener(element, 'input', () =>
-          this.validateField(key as keyof FormElements)
+        const inputKey = `${key}-input`;
+        const blurKey = `${key}-blur`;
+
+        DOMUtils.removeEventListener(
+          element,
+          'input',
+          this.eventHandlers[inputKey]
         );
-        DOMUtils.removeEventListener(element, 'blur', () =>
-          this.validateField(key as keyof FormElements)
+        DOMUtils.removeEventListener(
+          element,
+          'blur',
+          this.eventHandlers[blurKey]
         );
       }
     });

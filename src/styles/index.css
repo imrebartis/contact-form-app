@@ -60,8 +60,7 @@ h6 {
 }
 
 /* 9. Create a root stacking context */
-#root,
-#__next {
+#app {
   isolation: isolate;
 }
 
@@ -133,9 +132,9 @@ body {
 .contact-form textarea {
   width: 100%;
 }
-.contact-form input[type=text].error,
-.contact-form input[type=email].error,
-.contact-form textarea.error {
+.contact-form input[type=text][aria-invalid=true],
+.contact-form input[type=email][aria-invalid=true],
+.contact-form textarea[aria-invalid=true] {
   border-color: hsl(0, 66%, 54%);
 }
 .contact-form input[type=checkbox] {
@@ -164,7 +163,7 @@ body {
   color: hsl(0, 66%, 54%);
   display: none;
 }
-.contact-form .error-message.visible {
+.contact-form .error-message.error-visible {
   display: block;
 }
 .contact-form button {
@@ -206,15 +205,6 @@ body {
   left: 0;
   font-size: 0.875rem;
   color: hsl(0, 66%, 54%);
-}
-.contact-form .success-message {
-  margin-top: 16px;
-  padding: 16px;
-  text-align: center;
-  background-color: hsl(148, 38%, 91%);
-  border-radius: 4px;
-  color: hsl(187, 24%, 22%);
-  animation: fade-in 0.3s ease;
 }
 
 .radio-group {
@@ -302,13 +292,30 @@ body {
   color: hsl(169, 82%, 27%);
 }
 
+.toast-success {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "avatar title" "content content";
+  gap: 0.25rem 8px;
+  align-items: start;
+}
 .toast-success .toastify-avatar {
   width: 1.5rem;
   height: 1.5rem;
-  margin: 0 8px 0 0;
+  grid-area: avatar;
+  margin: 0;
 }
-.toast-success .toastify-avatar path {
-  color: hsl(148, 38%, 91%);
+.toast-success strong {
+  grid-area: title;
+  font-weight: 700;
+}
+
+.toast-success-wrapper {
+  display: contents;
+}
+
+.toast-success-content {
+  grid-area: content;
 }
 
 @keyframes fade-in {

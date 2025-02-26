@@ -34,6 +34,8 @@ describe('ToastService', () => {
       position: 'center',
       avatar: successIcon,
       className: 'toast-success',
+      escapeMarkup: false,
+      stopOnFocus: true,
       style: {
         background: 'hsl(187, 24%, 22%)',
         color: 'hsl(0, 0%, 100%)',
