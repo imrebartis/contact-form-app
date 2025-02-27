@@ -4,7 +4,7 @@ import { ErrorHandler } from './services/error-handler';
 import { FormRenderer } from './services/form-renderer';
 import { FormValidator } from './services/form-validator';
 import { ToastService } from './services/toast-service';
-import { FormData, FormElements } from './types/form.types';
+import { FormData, FormElementType, FormElements } from './types/form.types';
 import { DOMUtils } from './utils/dom-utils';
 
 import './styles/style.scss';
@@ -153,7 +153,12 @@ export class ContactForm {
       console.log('Form submitted:', formData);
 
       this.handleSuccessfulSubmission();
-    } catch (error) {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      } else {
+        console.error('An unknown error occurred.');
+      }
       this.handleFailedSubmission();
     }
   }
@@ -174,6 +179,23 @@ export class ContactForm {
     this.submitButton.textContent = text;
   }
 
+  private disableFormElements(): void {
+    Object.values(this.elements).forEach((element: FormElementType) => {
+      if (
+        element instanceof HTMLInputElement ||
+        element instanceof HTMLTextAreaElement
+      ) {
+        element.disabled = true;
+      } else if (element instanceof RadioNodeList) {
+        Array.from(element).forEach((radio) => {
+          if (radio instanceof HTMLInputElement) {
+            radio.disabled = true;
+          }
+        });
+      }
+    });
+  }
+
   private handleSuccessfulSubmission(): void {
     this.toastService.showSuccess(`
       <div class="toast-success-wrapper">
@@ -183,6 +205,7 @@ export class ContactForm {
         </div>
     </div>
     `);
+    this.disableFormElements();
     this.form.reset();
     this.submitButton.textContent = 'Sent';
     this.submitButton.disabled = true;
@@ -204,35 +227,37 @@ export class ContactForm {
       this.eventHandlers['form-submit']
     );
 
-    Object.entries(this.elements).forEach(([key, element]) => {
-      if (key === 'queryType') {
-        const radioButtons = element as RadioNodeList;
-        Array.from(radioButtons).forEach((radio, index) => {
-          if (radio instanceof HTMLInputElement) {
-            const handlerKey = `${key}-change-${index}`;
-            DOMUtils.removeEventListener(
-              radio,
-              'change',
-              this.eventHandlers[handlerKey]
-            );
-          }
-        });
-      } else {
-        const inputKey = `${key}-input`;
-        const blurKey = `${key}-blur`;
+    Object.entries(this.elements).forEach(
+      ([key, element]: [string, FormElementType]) => {
+        if (key === 'queryType') {
+          const radioButtons = element as RadioNodeList;
+          Array.from(radioButtons).forEach((radio, index) => {
+            if (radio instanceof HTMLInputElement) {
+              const handlerKey = `${key}-change-${index}`;
+              DOMUtils.removeEventListener(
+                radio,
+                'change',
+                this.eventHandlers[handlerKey]
+              );
+            }
+          });
+        } else {
+          const inputKey = `${key}-input`;
+          const blurKey = `${key}-blur`;
 
-        DOMUtils.removeEventListener(
-          element,
-          'input',
-          this.eventHandlers[inputKey]
-        );
-        DOMUtils.removeEventListener(
-          element,
-          'blur',
-          this.eventHandlers[blurKey]
-        );
+          DOMUtils.removeEventListener(
+            element as HTMLElement,
+            'input',
+            this.eventHandlers[inputKey]
+          );
+          DOMUtils.removeEventListener(
+            element as HTMLElement,
+            'blur',
+            this.eventHandlers[blurKey]
+          );
+        }
       }
-    });
+    );
   }
 }
 

@@ -7,6 +7,11 @@ export interface FormElements {
   consent: HTMLInputElement;
 }
 
+export type FormElementType =
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | RadioNodeList;
+
 export interface FormData {
   firstName: string;
   lastName: string;
