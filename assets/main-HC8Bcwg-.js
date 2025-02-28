@@ -126,4 +126,4 @@ var w=Object.defineProperty;var L=(n,t,e)=>t in n?w(n,t,{enumerable:!0,configura
         </div>
     </div>
     `),this.disableFormElements(),this.form.reset(),this.submitButton.textContent="Sent",this.submitButton.disabled=!0}handleFailedSubmission(){this.errorHandler.showError(this.form,"Failed to send message. Please try again."),this.submitButton.disabled=!1,this.submitButton.textContent="Submit"}cleanup(){f.removeEventListener(this.form,"submit",this.eventHandlers["form-submit"]),Object.entries(this.elements).forEach(([t,e])=>{if(t==="queryType"){const i=e;Array.from(i).forEach((r,o)=>{if(r instanceof HTMLInputElement){const s=`${t}-change-${o}`;f.removeEventListener(r,"change",this.eventHandlers[s])}})}else{const i=`${t}-input`,r=`${t}-blur`;f.removeEventListener(e,"input",this.eventHandlers[i]),f.removeEventListener(e,"blur",this.eventHandlers[r])}})}}let v;document.addEventListener("DOMContentLoaded",()=>{v=new M,v.init()});window.addEventListener("beforeunload",()=>{v&&v.cleanup()});
-//# sourceMappingURL=main-aMyh7OIo.js.map
+//# sourceMappingURL=main-HC8Bcwg-.js.map
