@@ -13,7 +13,7 @@ export class FormValidator {
     switch (fieldName) {
       case 'firstName':
       case 'lastName':
-        isValid = (element as HTMLInputElement).value.trim().length >= 2;
+        isValid = (element as HTMLInputElement).value.trim().length > 0;
         errorMessage = isValid ? '' : 'This field is required';
         break;
 

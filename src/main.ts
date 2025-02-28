@@ -138,9 +138,18 @@ export class ContactForm {
   }
 
   private validateAllFields(): boolean {
-    return Object.keys(this.elements).every((key) =>
-      this.validateField(key as keyof FormElements)
-    );
+    let allValid = true;
+
+    Object.keys(this.elements).forEach((key) => {
+      const fieldName = key as keyof FormElements;
+      const isValid = this.validateField(fieldName);
+
+      if (!isValid) {
+        allValid = false;
+      }
+    });
+
+    return allValid;
   }
 
   private async submitForm(): Promise<void> {
@@ -187,9 +196,17 @@ export class ContactForm {
       ) {
         element.disabled = true;
       } else if (element instanceof RadioNodeList) {
+        const radioGroup = document.querySelector('.radio-group');
+        if (radioGroup) {
+          radioGroup.classList.add('disabled');
+        }
         Array.from(element).forEach((radio) => {
           if (radio instanceof HTMLInputElement) {
             radio.disabled = true;
+            const radioOption = radio.closest('.radio-option');
+            if (radioOption) {
+              radioOption.classList.add('disabled');
+            }
           }
         });
       }

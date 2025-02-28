@@ -18,7 +18,7 @@ describe('FormValidator', () => {
       expect(result.isValid).toBe(false);
       expect(result.errorMessage).toBe('This field is required');
 
-      input.value = 'J';
+      input.value = '';
       result = validator.validateField('firstName', input);
       expect(result.isValid).toBe(false);
 

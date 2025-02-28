@@ -151,6 +151,9 @@ body {
   outline: none;
   box-shadow: 0 0 0 2px rgba(223.329, 240.771, 231.4686, 0.5);
 }
+.contact-form input[type=checkbox]:disabled {
+  cursor: default;
+}
 .contact-form textarea {
   min-height: 6.5rem;
   resize: vertical;
@@ -217,6 +220,9 @@ body {
   font-size: 16px;
   color: hsl(0, 0%, 20%);
 }
+.radio-group.disabled legend {
+  cursor: default;
+}
 
 .radio-option {
   position: relative;
@@ -227,7 +233,10 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
 }
-.radio-option:hover {
+.radio-option.disabled {
+  cursor: default;
+}
+.radio-option:hover:not(.disabled) {
   border-color: hsl(169, 82%, 27%);
 }
 .radio-option label {
@@ -280,6 +289,9 @@ body {
 .radio-option input[type=radio]:focus + label {
   outline: 0.125rem solid hsl(169, 82%, 27%);
   outline-offset: 0.125rem;
+}
+.radio-option input[type=radio]:disabled, .radio-option input[type=radio]:disabled + label {
+  cursor: default;
 }
 .radio-option input[type=radio]:checked + label::before {
   border-color: hsl(169, 82%, 27%);

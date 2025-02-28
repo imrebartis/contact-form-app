@@ -100,4 +100,49 @@ describe('ContactForm', () => {
 
     vi.useRealTimers();
   });
+
+  it('should validate specific fields and show errors only for those fields', async () => {
+    const contactForm = new ContactForm();
+    contactForm.init();
+
+    const form = document.querySelector('form') as HTMLFormElement;
+    const firstName = form.querySelector('#first-name') as HTMLInputElement;
+    const lastName = form.querySelector('#last-name') as HTMLInputElement;
+    const email = form.querySelector('#email') as HTMLInputElement;
+
+    firstName.value = 'John';
+
+    form.dispatchEvent(new Event('submit'));
+
+    const firstNameError = firstName.nextElementSibling as HTMLElement;
+    const lastNameError = lastName.nextElementSibling as HTMLElement;
+    const emailError = email.nextElementSibling as HTMLElement;
+
+    expect(firstNameError.classList.contains('error-visible')).toBe(false);
+    expect(lastNameError.classList.contains('error-visible')).toBe(true);
+    expect(emailError.classList.contains('error-visible')).toBe(true);
+
+    lastName.value = 'Doe';
+    email.value = 'john.doe@example.com';
+    const message = form.querySelector('#message') as HTMLTextAreaElement;
+    message.value = 'Test message';
+    const consent = form.querySelector('#consent') as HTMLInputElement;
+    consent.checked = true;
+    const radioButtons = form.querySelectorAll('[name="query-type"]');
+    (radioButtons[0] as HTMLInputElement).checked = true;
+
+    vi.useFakeTimers();
+    form.dispatchEvent(new Event('submit'));
+
+    expect(firstNameError.classList.contains('error-visible')).toBe(false);
+    expect(lastNameError.classList.contains('error-visible')).toBe(false);
+    expect(emailError.classList.contains('error-visible')).toBe(false);
+
+    vi.advanceTimersByTime(100);
+    const submitButton = form.querySelector('button') as HTMLButtonElement;
+    expect(submitButton.disabled).toBe(true);
+    expect(submitButton.textContent).toBe('Sending...');
+
+    vi.useRealTimers();
+  });
 });

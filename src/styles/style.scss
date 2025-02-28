@@ -52,6 +52,10 @@ body {
 
   input[type='checkbox'] {
     @include mix.checkbox-element;
+
+    &:disabled {
+      cursor: default;
+    }
   }
 
   textarea {
@@ -116,6 +120,10 @@ body {
     font-size: $font-size-base;
     color: $text-color;
   }
+
+  &.disabled legend {
+    cursor: default;
+  }
 }
 
 .radio-option {
@@ -127,7 +135,11 @@ body {
   cursor: pointer;
   transition: all $transition-duration ease;
 
-  &:hover {
+  &.disabled {
+    cursor: default;
+  }
+
+  &:hover:not(.disabled) {
     border-color: $primary-color;
   }
 
@@ -186,6 +198,11 @@ body {
     &:focus + label {
       outline: rem(2px) solid $primary-color;
       outline-offset: rem(2px);
+    }
+
+    &:disabled,
+    &:disabled + label {
+      cursor: default;
     }
   }
 
