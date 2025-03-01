@@ -47,15 +47,16 @@ export class DOMUtils {
   }
 
   static addEventListener(
-    element: HTMLElement,
+    element: EventTarget,
     eventType: string,
-    handler: EventListenerOrEventListenerObject
+    handler: EventListenerOrEventListenerObject,
+    signal?: AbortSignal
   ): void {
-    element.addEventListener(eventType, handler);
+    element.addEventListener(eventType, handler, { signal });
   }
 
   static removeEventListener(
-    element: HTMLElement,
+    element: EventTarget,
     eventType: string,
     handler: EventListenerOrEventListenerObject
   ): void {

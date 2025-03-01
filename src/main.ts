@@ -17,14 +17,14 @@ export class ContactForm {
   private toastService: ToastService;
   private errorHandler: ErrorHandler;
   private formRenderer: FormRenderer;
-  private eventHandlers: Record<string, EventListenerOrEventListenerObject> =
-    {};
+  protected abortController: AbortController;
 
   constructor() {
     this.validator = new FormValidator();
     this.toastService = new ToastService();
     this.errorHandler = new ErrorHandler();
     this.formRenderer = new FormRenderer();
+    this.abortController = new AbortController();
   }
 
   init(): void {
@@ -47,49 +47,41 @@ export class ContactForm {
   }
 
   private setupEventListeners(): void {
-    this.eventHandlers['form-submit'] = this.handleSubmit.bind(this);
+    const { signal } = this.abortController;
+
     DOMUtils.addEventListener(
       this.form,
       'submit',
-      this.eventHandlers['form-submit']
+      this.handleSubmit.bind(this),
+      signal
     );
 
     Object.entries(this.elements).forEach(([key, element]) => {
       if (key === 'queryType') {
         const radioButtons = element as RadioNodeList;
-        Array.from(radioButtons).forEach((radio, index) => {
+        Array.from(radioButtons).forEach((radio) => {
           if (radio instanceof HTMLInputElement) {
-            const handlerKey = `${key}-change-${index}`;
-            this.eventHandlers[handlerKey] = this.validateField.bind(
-              this,
-              key as keyof FormElements
-            );
             DOMUtils.addEventListener(
               radio,
               'change',
-              this.eventHandlers[handlerKey]
+              this.validateField.bind(this, key as keyof FormElements),
+              signal
             );
           }
         });
       } else {
-        const inputKey = `${key}-input`;
-        const blurKey = `${key}-blur`;
-
-        this.eventHandlers[inputKey] = this.validateField.bind(
-          this,
-          key as keyof FormElements
-        );
-        this.eventHandlers[blurKey] = this.validateField.bind(
-          this,
-          key as keyof FormElements
-        );
-
         DOMUtils.addEventListener(
           element,
           'input',
-          this.eventHandlers[inputKey]
+          this.validateField.bind(this, key as keyof FormElements),
+          signal
         );
-        DOMUtils.addEventListener(element, 'blur', this.eventHandlers[blurKey]);
+        DOMUtils.addEventListener(
+          element,
+          'blur',
+          this.validateField.bind(this, key as keyof FormElements),
+          signal
+        );
       }
     });
   }
@@ -100,7 +92,7 @@ export class ContactForm {
     }
   }
 
-  private validateField(fieldName: keyof FormElements): boolean {
+  protected validateField(fieldName: keyof FormElements): boolean {
     const element = this.elements[fieldName];
     const { isValid, errorMessage } = this.validator.validateField(
       fieldName,
@@ -238,43 +230,9 @@ export class ContactForm {
   }
 
   cleanup(): void {
-    DOMUtils.removeEventListener(
-      this.form,
-      'submit',
-      this.eventHandlers['form-submit']
-    );
-
-    Object.entries(this.elements).forEach(
-      ([key, element]: [string, FormElementType]) => {
-        if (key === 'queryType') {
-          const radioButtons = element as RadioNodeList;
-          Array.from(radioButtons).forEach((radio, index) => {
-            if (radio instanceof HTMLInputElement) {
-              const handlerKey = `${key}-change-${index}`;
-              DOMUtils.removeEventListener(
-                radio,
-                'change',
-                this.eventHandlers[handlerKey]
-              );
-            }
-          });
-        } else {
-          const inputKey = `${key}-input`;
-          const blurKey = `${key}-blur`;
-
-          DOMUtils.removeEventListener(
-            element as HTMLElement,
-            'input',
-            this.eventHandlers[inputKey]
-          );
-          DOMUtils.removeEventListener(
-            element as HTMLElement,
-            'blur',
-            this.eventHandlers[blurKey]
-          );
-        }
-      }
-    );
+    this.abortController.abort();
+    // Create a new controller in case the form is reinitialized
+    this.abortController = new AbortController();
   }
 }
 

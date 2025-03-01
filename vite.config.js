@@ -32,9 +32,29 @@ export default defineConfig({
       },
     },
   },
+  setupFiles: ['./src/tests/setup.ts'],
+  environmentOptions: {
+    happyDOM: {
+      settings: {
+        disableJavaScriptEvaluation: false,
+        disableJavaScriptFileLoading: false,
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
+    testTimeout: 10000,
+    fakeTimers: {
+      enable: true,
+      toFake: [
+        'setTimeout',
+        'clearTimeout',
+        'setInterval',
+        'clearInterval',
+        'Date',
+      ],
+    },
   },
 });
