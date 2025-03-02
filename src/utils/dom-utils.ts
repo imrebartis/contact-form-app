@@ -46,6 +46,24 @@ export class DOMUtils {
     return element;
   }
 
+  static getElementByName(
+    form: HTMLFormElement,
+    name: string
+  ): Element | RadioNodeList | null {
+    return form.elements.namedItem(name);
+  }
+
+  static getErrorContainer(
+    fieldName: string,
+    element: HTMLElement | null
+  ): HTMLElement | null {
+    if (fieldName === 'queryType') {
+      return document.querySelector('.radio-group') as HTMLElement;
+    } else {
+      return element;
+    }
+  }
+
   static addEventListener(
     element: EventTarget,
     eventType: string,
@@ -135,6 +153,48 @@ export class DOMUtils {
       } else {
         element.classList.remove(visibleClassName);
         element.classList.add(hiddenClassName);
+      }
+    }
+  }
+
+  static disableElement(
+    element: HTMLElement,
+    isDisabled: boolean = true
+  ): void {
+    if (
+      element instanceof HTMLInputElement ||
+      element instanceof HTMLTextAreaElement ||
+      element instanceof HTMLButtonElement
+    ) {
+      element.disabled = isDisabled;
+    }
+  }
+
+  static disableRadioGroup(
+    radioNodeList: RadioNodeList,
+    isDisabled: boolean = true
+  ): void {
+    Array.from(radioNodeList).forEach((radio) => {
+      if (radio instanceof HTMLInputElement) {
+        radio.disabled = isDisabled;
+
+        const radioOption = radio.closest('.radio-option');
+        if (radioOption) {
+          if (isDisabled) {
+            radioOption.classList.add('disabled');
+          } else {
+            radioOption.classList.remove('disabled');
+          }
+        }
+      }
+    });
+
+    const radioGroup = document.querySelector('.radio-group');
+    if (radioGroup) {
+      if (isDisabled) {
+        radioGroup.classList.add('disabled');
+      } else {
+        radioGroup.classList.remove('disabled');
       }
     }
   }

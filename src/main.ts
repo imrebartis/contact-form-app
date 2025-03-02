@@ -36,12 +36,15 @@ export class ContactForm {
 
   private setupElements(): void {
     this.elements = {
-      firstName: document.getElementById('first-name') as HTMLInputElement,
-      lastName: document.getElementById('last-name') as HTMLInputElement,
-      email: document.getElementById('email') as HTMLInputElement,
-      queryType: this.form.elements.namedItem('query-type') as RadioNodeList,
-      message: document.getElementById('message') as HTMLTextAreaElement,
-      consent: document.getElementById('consent') as HTMLInputElement,
+      firstName: DOMUtils.getElementById('first-name') as HTMLInputElement,
+      lastName: DOMUtils.getElementById('last-name') as HTMLInputElement,
+      email: DOMUtils.getElementById('email') as HTMLInputElement,
+      queryType: DOMUtils.getElementByName(
+        this.form,
+        'query-type'
+      ) as RadioNodeList,
+      message: DOMUtils.getElementById('message') as HTMLTextAreaElement,
+      consent: DOMUtils.getElementById('consent') as HTMLInputElement,
     };
     this.submitButton = this.form.querySelector('button') as HTMLButtonElement;
   }
@@ -49,12 +52,9 @@ export class ContactForm {
   private setupEventListeners(): void {
     const { signal } = this.abortController;
 
-    DOMUtils.addEventListener(
-      this.form,
-      'submit',
-      this.handleSubmit.bind(this),
-      signal
-    );
+    const boundSubmitHandler = (e: Event) => this.handleSubmit(e);
+
+    DOMUtils.addEventListener(this.form, 'submit', boundSubmitHandler, signal);
 
     Object.entries(this.elements).forEach(([key, element]) => {
       if (key === 'queryType') {
@@ -99,19 +99,14 @@ export class ContactForm {
       element as HTMLElement
     );
 
-    let errorContainer: HTMLElement;
+    const errorContainer = DOMUtils.getErrorContainer(
+      fieldName,
+      element as HTMLElement | null
+    );
 
-    if (fieldName === 'queryType') {
-      errorContainer = document.querySelector('.radio-group') as HTMLElement;
-    } else if (fieldName === 'consent') {
-      errorContainer = document.querySelector(
-        '.checkbox-container'
-      ) as HTMLElement;
-    } else {
-      errorContainer = element as HTMLElement;
+    if (errorContainer) {
+      this.errorHandler.showError(errorContainer, isValid ? '' : errorMessage);
     }
-
-    this.errorHandler.showError(errorContainer, isValid ? '' : errorMessage);
     return isValid;
   }
 
@@ -186,34 +181,19 @@ export class ContactForm {
         element instanceof HTMLInputElement ||
         element instanceof HTMLTextAreaElement
       ) {
-        element.disabled = true;
+        DOMUtils.disableElement(element, true);
       } else if (element instanceof RadioNodeList) {
-        const radioGroup = document.querySelector('.radio-group');
-        if (radioGroup) {
-          radioGroup.classList.add('disabled');
-        }
-        Array.from(element).forEach((radio) => {
-          if (radio instanceof HTMLInputElement) {
-            radio.disabled = true;
-            const radioOption = radio.closest('.radio-option');
-            if (radioOption) {
-              radioOption.classList.add('disabled');
-            }
-          }
-        });
+        DOMUtils.disableRadioGroup(element, true);
       }
     });
   }
 
   private handleSuccessfulSubmission(): void {
-    this.toastService.showSuccess(`
-      <div class="toast-success-wrapper">
-        <strong>Message Sent!</strong>
-        <div class="toast-success-content">
-          Thanks for completing the form. We'll be in touch soon!
-        </div>
-    </div>
-    `);
+    this.toastService.showFormSubmissionSuccess(
+      'Message Sent!',
+      "Thanks for completing the form. We'll be in touch soon!"
+    );
+
     this.disableFormElements();
     this.form.reset();
     this.submitButton.textContent = 'Sent';

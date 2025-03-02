@@ -31,4 +31,17 @@ export class ToastService {
       },
     }).showToast();
   }
+
+  showFormSubmissionSuccess(title: string, message: string): void {
+    const formattedMessage = `
+      <div class="toast-success-wrapper">
+        <strong>${title}</strong>
+        <div class="toast-success-content">
+          ${message}
+        </div>
+      </div>
+    `;
+
+    this.showSuccess(formattedMessage);
+  }
 }
