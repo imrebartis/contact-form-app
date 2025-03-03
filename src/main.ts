@@ -10,31 +10,40 @@ import { DOMUtils } from './utils/dom-utils';
 import './styles/style.scss';
 
 export class ContactForm {
-  private form!: HTMLFormElement;
-  private elements!: FormElements;
-  private submitButton!: HTMLButtonElement;
-  private validator: FormValidator;
-  private toastService: ToastService;
-  private errorHandler: ErrorHandler;
-  private formRenderer: FormRenderer;
+  protected form!: HTMLFormElement;
+  protected elements!: FormElements;
+  protected submitButton!: HTMLButtonElement;
+  protected validator: FormValidator;
+  protected toastService: ToastService;
+  protected errorHandler: ErrorHandler;
+  protected formRenderer: FormRenderer;
   protected abortController: AbortController;
 
-  constructor() {
-    this.validator = new FormValidator();
-    this.toastService = new ToastService();
-    this.errorHandler = new ErrorHandler();
-    this.formRenderer = new FormRenderer();
+  constructor(
+    validator?: FormValidator,
+    toastService?: ToastService,
+    errorHandler?: ErrorHandler,
+    formRenderer?: FormRenderer
+  ) {
+    this.validator = validator || new FormValidator();
+    this.toastService = toastService || new ToastService();
+    this.errorHandler = errorHandler || new ErrorHandler();
+    this.formRenderer = formRenderer || new FormRenderer();
     this.abortController = new AbortController();
   }
 
   init(): void {
-    this.form = this.formRenderer.renderForm();
+    this.form = this.createForm();
     this.setupElements();
     this.setupEventListeners();
-    this.setInitialFocus();
+    this.onAfterInit();
   }
 
-  private setupElements(): void {
+  protected createForm(): HTMLFormElement {
+    return this.formRenderer.renderForm();
+  }
+
+  protected setupElements(): void {
     this.elements = {
       firstName: DOMUtils.getElementById('first-name') as HTMLInputElement,
       lastName: DOMUtils.getElementById('last-name') as HTMLInputElement,
@@ -49,7 +58,7 @@ export class ContactForm {
     this.submitButton = this.form.querySelector('button') as HTMLButtonElement;
   }
 
-  private setupEventListeners(): void {
+  protected setupEventListeners(): void {
     const { signal } = this.abortController;
 
     const boundSubmitHandler = (e: Event) => this.handleSubmit(e);
@@ -58,27 +67,23 @@ export class ContactForm {
 
     Object.entries(this.elements).forEach(([key, element]) => {
       if (key === 'queryType') {
-        const radioButtons = element as RadioNodeList;
-        Array.from(radioButtons).forEach((radio) => {
-          if (radio instanceof HTMLInputElement) {
-            DOMUtils.addEventListener(
-              radio,
-              'change',
-              this.validateField.bind(this, key as keyof FormElements),
-              signal
-            );
-          }
-        });
+        this.setupRadioGroupListeners(element as RadioNodeList, key, signal);
       } else {
+        this.setupInputListeners(element, key, signal);
+      }
+    });
+  }
+
+  protected setupRadioGroupListeners(
+    radioNodeList: RadioNodeList,
+    key: string,
+    signal: AbortSignal
+  ): void {
+    Array.from(radioNodeList).forEach((radio) => {
+      if (radio instanceof HTMLInputElement) {
         DOMUtils.addEventListener(
-          element,
-          'input',
-          this.validateField.bind(this, key as keyof FormElements),
-          signal
-        );
-        DOMUtils.addEventListener(
-          element,
-          'blur',
+          radio,
+          'change',
           this.validateField.bind(this, key as keyof FormElements),
           signal
         );
@@ -86,7 +91,30 @@ export class ContactForm {
     });
   }
 
-  private setInitialFocus(): void {
+  protected setupInputListeners(
+    element: EventTarget,
+    key: string,
+    signal: AbortSignal
+  ): void {
+    DOMUtils.addEventListener(
+      element,
+      'input',
+      this.validateField.bind(this, key as keyof FormElements),
+      signal
+    );
+    DOMUtils.addEventListener(
+      element,
+      'blur',
+      this.validateField.bind(this, key as keyof FormElements),
+      signal
+    );
+  }
+
+  protected onAfterInit(): void {
+    this.setInitialFocus();
+  }
+
+  protected setInitialFocus(): void {
     if (this.elements.firstName) {
       this.elements.firstName.focus();
     }
@@ -110,7 +138,7 @@ export class ContactForm {
     return isValid;
   }
 
-  private async handleSubmit(e: Event): Promise<void> {
+  protected async handleSubmit(e: Event): Promise<void> {
     e.preventDefault();
 
     if (this.submitButton.disabled) {
@@ -124,7 +152,7 @@ export class ContactForm {
     }
   }
 
-  private validateAllFields(): boolean {
+  protected validateAllFields(): boolean {
     let allValid = true;
 
     Object.keys(this.elements).forEach((key) => {
@@ -139,27 +167,25 @@ export class ContactForm {
     return allValid;
   }
 
-  private async submitForm(): Promise<void> {
+  protected async submitForm(): Promise<void> {
     this.disableSubmitButton('Sending...');
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const formData: FormData = this.collectFormData();
-      console.log('Form submitted:', formData);
-
+      await this.performSubmission();
       this.handleSuccessfulSubmission();
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(error.message);
-      } else {
-        console.error('An unknown error occurred.');
-      }
-      this.handleFailedSubmission();
+      this.handleFailedSubmission(error);
     }
   }
 
-  private collectFormData(): FormData {
+  protected async performSubmission(): Promise<void> {
+    // Default implementation
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const formData = this.collectFormData();
+    console.log('Form submitted:', formData);
+  }
+
+  protected collectFormData(): FormData {
     return {
       firstName: this.elements.firstName.value,
       lastName: this.elements.lastName.value,
@@ -170,12 +196,12 @@ export class ContactForm {
     };
   }
 
-  private disableSubmitButton(text: string): void {
+  protected disableSubmitButton(text: string): void {
     this.submitButton.disabled = true;
     this.submitButton.textContent = text;
   }
 
-  private disableFormElements(): void {
+  protected disableFormElements(): void {
     Object.values(this.elements).forEach((element: FormElementType) => {
       if (
         element instanceof HTMLInputElement ||
@@ -188,7 +214,7 @@ export class ContactForm {
     });
   }
 
-  private handleSuccessfulSubmission(): void {
+  protected handleSuccessfulSubmission(): void {
     this.toastService.showFormSubmissionSuccess(
       'Message Sent!',
       "Thanks for completing the form. We'll be in touch soon!"
@@ -200,7 +226,13 @@ export class ContactForm {
     this.submitButton.disabled = true;
   }
 
-  private handleFailedSubmission(): void {
+  protected handleFailedSubmission(error?: unknown): void {
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error('An unknown error occurred.');
+    }
+
     this.errorHandler.showError(
       this.form,
       'Failed to send message. Please try again.'
