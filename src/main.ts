@@ -2,22 +2,28 @@
 
 import { ErrorHandler } from './services/error-handler';
 import { FormRenderer } from './services/form-renderer';
+import { FormSubmitter } from './services/form-submitter';
 import { FormValidator } from './services/form-validator';
 import { ToastService } from './services/toast-service';
-import { FormData, FormElementType, FormElements } from './types/form.types';
-import { DOMUtils } from './utils/dom-utils';
+import { FormData, FormElements } from './types/form.types';
+import { FormView } from './views/form-view';
 
 import './styles/style.scss';
 
 export class ContactForm {
-  protected form!: HTMLFormElement;
-  protected elements!: FormElements;
-  protected submitButton!: HTMLButtonElement;
+  protected view: FormView;
   protected validator: FormValidator;
-  protected toastService: ToastService;
-  protected errorHandler: ErrorHandler;
-  protected formRenderer: FormRenderer;
-  protected abortController: AbortController;
+  protected submitter: FormSubmitter;
+  protected elements!: FormElements;
+
+  // Getter and setter for testing purposes
+  get abortController(): AbortController {
+    return this.view.getAbortController();
+  }
+
+  set abortController(controller: AbortController) {
+    this.view.setAbortController(controller);
+  }
 
   constructor(
     validator?: FormValidator,
@@ -26,98 +32,23 @@ export class ContactForm {
     formRenderer?: FormRenderer
   ) {
     this.validator = validator || new FormValidator();
-    this.toastService = toastService || new ToastService();
-    this.errorHandler = errorHandler || new ErrorHandler();
-    this.formRenderer = formRenderer || new FormRenderer();
-    this.abortController = new AbortController();
+    const toast = toastService || new ToastService();
+    const error = errorHandler || new ErrorHandler();
+    const renderer = formRenderer || new FormRenderer();
+
+    this.view = new FormView(renderer, error);
+    this.submitter = new FormSubmitter(toast);
   }
 
   init(): void {
-    this.form = this.createForm();
-    this.setupElements();
-    this.setupEventListeners();
-    this.onAfterInit();
-  }
-
-  protected createForm(): HTMLFormElement {
-    return this.formRenderer.renderForm();
-  }
-
-  protected setupElements(): void {
-    this.elements = {
-      firstName: DOMUtils.getElementById('first-name') as HTMLInputElement,
-      lastName: DOMUtils.getElementById('last-name') as HTMLInputElement,
-      email: DOMUtils.getElementById('email') as HTMLInputElement,
-      queryType: DOMUtils.getElementByName(
-        this.form,
-        'query-type'
-      ) as RadioNodeList,
-      message: DOMUtils.getElementById('message') as HTMLTextAreaElement,
-      consent: DOMUtils.getElementById('consent') as HTMLInputElement,
-    };
-    this.submitButton = this.form.querySelector('button') as HTMLButtonElement;
-  }
-
-  protected setupEventListeners(): void {
-    const { signal } = this.abortController;
+    this.view.createForm();
+    this.elements = this.view.getFormElements();
 
     const boundSubmitHandler = (e: Event) => this.handleSubmit(e);
+    const boundValidateField = (fieldName: keyof FormElements) =>
+      this.validateField(fieldName);
 
-    DOMUtils.addEventListener(this.form, 'submit', boundSubmitHandler, signal);
-
-    Object.entries(this.elements).forEach(([key, element]) => {
-      if (key === 'queryType') {
-        this.setupRadioGroupListeners(element as RadioNodeList, key, signal);
-      } else {
-        this.setupInputListeners(element, key, signal);
-      }
-    });
-  }
-
-  protected setupRadioGroupListeners(
-    radioNodeList: RadioNodeList,
-    key: string,
-    signal: AbortSignal
-  ): void {
-    Array.from(radioNodeList).forEach((radio) => {
-      if (radio instanceof HTMLInputElement) {
-        DOMUtils.addEventListener(
-          radio,
-          'change',
-          this.validateField.bind(this, key as keyof FormElements),
-          signal
-        );
-      }
-    });
-  }
-
-  protected setupInputListeners(
-    element: EventTarget,
-    key: string,
-    signal: AbortSignal
-  ): void {
-    DOMUtils.addEventListener(
-      element,
-      'input',
-      this.validateField.bind(this, key as keyof FormElements),
-      signal
-    );
-    DOMUtils.addEventListener(
-      element,
-      'blur',
-      this.validateField.bind(this, key as keyof FormElements),
-      signal
-    );
-  }
-
-  protected onAfterInit(): void {
-    this.setInitialFocus();
-  }
-
-  protected setInitialFocus(): void {
-    if (this.elements.firstName) {
-      this.elements.firstName.focus();
-    }
+    this.view.setupEventListeners(boundSubmitHandler, boundValidateField);
   }
 
   protected validateField(fieldName: keyof FormElements): boolean {
@@ -127,21 +58,15 @@ export class ContactForm {
       element as HTMLElement
     );
 
-    const errorContainer = DOMUtils.getErrorContainer(
-      fieldName,
-      element as HTMLElement | null
-    );
-
-    if (errorContainer) {
-      this.errorHandler.showError(errorContainer, isValid ? '' : errorMessage);
-    }
+    this.view.showFieldError(fieldName, isValid ? '' : errorMessage);
     return isValid;
   }
 
   protected async handleSubmit(e: Event): Promise<void> {
     e.preventDefault();
 
-    if (this.submitButton.disabled) {
+    const submitButton = this.view.getSubmitButton();
+    if (submitButton.disabled) {
       return;
     }
 
@@ -168,21 +93,15 @@ export class ContactForm {
   }
 
   protected async submitForm(): Promise<void> {
-    this.disableSubmitButton('Sending...');
+    this.view.disableSubmitButton('Sending...');
 
     try {
-      await this.performSubmission();
+      const formData = this.collectFormData();
+      await this.submitter.submitForm(formData);
       this.handleSuccessfulSubmission();
     } catch (error: unknown) {
       this.handleFailedSubmission(error);
     }
-  }
-
-  protected async performSubmission(): Promise<void> {
-    // Default implementation
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const formData = this.collectFormData();
-    console.log('Form submitted:', formData);
   }
 
   protected collectFormData(): FormData {
@@ -196,34 +115,11 @@ export class ContactForm {
     };
   }
 
-  protected disableSubmitButton(text: string): void {
-    this.submitButton.disabled = true;
-    this.submitButton.textContent = text;
-  }
-
-  protected disableFormElements(): void {
-    Object.values(this.elements).forEach((element: FormElementType) => {
-      if (
-        element instanceof HTMLInputElement ||
-        element instanceof HTMLTextAreaElement
-      ) {
-        DOMUtils.disableElement(element, true);
-      } else if (element instanceof RadioNodeList) {
-        DOMUtils.disableRadioGroup(element, true);
-      }
-    });
-  }
-
   protected handleSuccessfulSubmission(): void {
-    this.toastService.showFormSubmissionSuccess(
-      'Message Sent!',
-      "Thanks for completing the form. We'll be in touch soon!"
-    );
-
-    this.disableFormElements();
-    this.form.reset();
-    this.submitButton.textContent = 'Sent';
-    this.submitButton.disabled = true;
+    this.submitter.showSuccessMessage();
+    this.view.disableFormElements();
+    this.view.resetForm();
+    this.view.disableSubmitButton('Sent');
   }
 
   protected handleFailedSubmission(error?: unknown): void {
@@ -233,18 +129,12 @@ export class ContactForm {
       console.error('An unknown error occurred.');
     }
 
-    this.errorHandler.showError(
-      this.form,
-      'Failed to send message. Please try again.'
-    );
-    this.submitButton.disabled = false;
-    this.submitButton.textContent = 'Submit';
+    this.view.showFormError('Failed to send message. Please try again.');
+    this.view.resetSubmitButton();
   }
 
   cleanup(): void {
-    this.abortController.abort();
-    // Create a new controller in case the form is reinitialized
-    this.abortController = new AbortController();
+    this.view.cleanup();
   }
 }
 
