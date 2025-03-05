@@ -1,6 +1,8 @@
 'use strict';
 
-export class FormRenderer {
+import { IFormRenderer } from '../interfaces/form-interfaces';
+
+export class FormRenderer implements IFormRenderer {
   renderForm(): HTMLFormElement {
     document.body.innerHTML = `
       <main class="container">

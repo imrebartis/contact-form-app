@@ -1,8 +1,9 @@
 'use strict';
 
+import { IErrorHandler } from '../interfaces/form-interfaces';
 import { DOMUtils } from '../utils/dom-utils';
 
-export class ErrorHandler {
+export class ErrorHandler implements IErrorHandler {
   private activeErrors: Map<string, Set<HTMLElement>> = new Map();
 
   showError(element: HTMLElement, message: string, groupId = 'default'): void {

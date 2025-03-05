@@ -1,27 +1,37 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ContactForm } from '../main';
+import { ContactForm, ContactFormFactory } from '../main';
 import { FormRenderer } from '../services/form-renderer';
 
 describe('ContactForm', () => {
+  let contactForm: ContactForm;
   let formElement: HTMLFormElement;
 
   beforeEach(() => {
     document.body.innerHTML = '';
+
     const renderer = new FormRenderer();
     formElement = renderer.renderForm();
     document.body.appendChild(formElement);
+
+    contactForm = ContactFormFactory.create();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('should display validation errors on empty form submission', () => {
-    formElement.dispatchEvent(new Event('submit'));
+    contactForm.init();
+    const form = document.querySelector('form') as HTMLFormElement;
+    form.dispatchEvent(new Event('submit'));
 
     const errorMessages = document.querySelectorAll('.error-message');
     expect(errorMessages.length).toBeGreaterThan(0);
   });
 
   it('should validate fields as user types', () => {
-    const contactForm = new ContactForm();
+    const contactForm = ContactFormFactory.create();
     contactForm.init();
 
     const firstNameInput = document.getElementById(
@@ -44,12 +54,12 @@ describe('ContactForm', () => {
   });
 
   it('should prevent multiple submissions', () => {
-    const submitButton = formElement.querySelector(
-      'button'
-    ) as HTMLButtonElement;
+    contactForm.init();
+    const submitButton = document.querySelector('button') as HTMLButtonElement;
     submitButton.disabled = true;
 
-    formElement.dispatchEvent(new Event('submit'));
+    const form = document.querySelector('form') as HTMLFormElement;
+    form.dispatchEvent(new Event('submit'));
 
     expect(submitButton.disabled).toBe(true);
     expect(submitButton.textContent).not.toBe('Sending...');
@@ -58,9 +68,7 @@ describe('ContactForm', () => {
   it('should disable all form elements after successful submission', async () => {
     vi.useFakeTimers();
 
-    const contactForm = new ContactForm();
-
-    document.body.appendChild = vi.fn();
+    const contactForm = ContactFormFactory.create();
     contactForm.init();
 
     const form = document.querySelector('form') as HTMLFormElement;
@@ -102,7 +110,7 @@ describe('ContactForm', () => {
   });
 
   it('should validate specific fields and show errors only for those fields', async () => {
-    const contactForm = new ContactForm();
+    const contactForm = ContactFormFactory.create();
     contactForm.init();
 
     const form = document.querySelector('form') as HTMLFormElement;

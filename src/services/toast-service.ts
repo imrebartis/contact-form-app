@@ -5,8 +5,9 @@ import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
 
 import successIcon from '../assets/images/icon-success-check.svg';
+import { IToastService } from '../interfaces/form-interfaces';
 
-export class ToastService {
+export class ToastService implements IToastService {
   showSuccess(message: string): void {
     Toastify({
       text: message,

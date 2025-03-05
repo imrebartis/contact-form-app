@@ -1,5 +1,10 @@
 'use strict';
 
+import {
+  IFormSubmitter,
+  IFormValidator,
+  IFormView,
+} from './interfaces/form-interfaces';
 import { ErrorHandler } from './services/error-handler';
 import { FormRenderer } from './services/form-renderer';
 import { FormSubmitter } from './services/form-submitter';
@@ -11,9 +16,9 @@ import { FormView } from './views/form-view';
 import './styles/style.scss';
 
 export class ContactForm {
-  protected view: FormView;
-  protected validator: FormValidator;
-  protected submitter: FormSubmitter;
+  protected view: IFormView;
+  protected validator: IFormValidator;
+  protected submitter: IFormSubmitter;
   protected elements!: FormElements;
 
   // Getter and setter for testing purposes
@@ -26,29 +31,29 @@ export class ContactForm {
   }
 
   constructor(
-    validator?: FormValidator,
-    toastService?: ToastService,
-    errorHandler?: ErrorHandler,
-    formRenderer?: FormRenderer
+    validator: IFormValidator,
+    submitter: IFormSubmitter,
+    view: IFormView
   ) {
-    this.validator = validator || new FormValidator();
-    const toast = toastService || new ToastService();
-    const error = errorHandler || new ErrorHandler();
-    const renderer = formRenderer || new FormRenderer();
-
-    this.view = new FormView(renderer, error);
-    this.submitter = new FormSubmitter(toast);
+    this.validator = validator;
+    this.submitter = submitter;
+    this.view = view;
   }
 
   init(): void {
-    this.view.createForm();
-    this.elements = this.view.getFormElements();
+    try {
+      this.view.createForm();
+      this.elements = this.view.getFormElements();
 
-    const boundSubmitHandler = (e: Event) => this.handleSubmit(e);
-    const boundValidateField = (fieldName: keyof FormElements) =>
-      this.validateField(fieldName);
+      const boundSubmitHandler = (e: Event) => this.handleSubmit(e);
+      const boundValidateField = (fieldName: keyof FormElements) =>
+        this.validateField(fieldName);
 
-    this.view.setupEventListeners(boundSubmitHandler, boundValidateField);
+      this.view.setupEventListeners(boundSubmitHandler, boundValidateField);
+    } catch (error) {
+      console.error('Error in ContactForm init:', error);
+      throw error; // Re-throw to make test failures more obvious
+    }
   }
 
   protected validateField(fieldName: keyof FormElements): boolean {
@@ -138,10 +143,25 @@ export class ContactForm {
   }
 }
 
+// Factory to create fully configured ContactForm
+export class ContactFormFactory {
+  static create(): ContactForm {
+    const validator = new FormValidator();
+    const toastService = new ToastService();
+    const errorHandler = new ErrorHandler();
+    const formRenderer = new FormRenderer();
+
+    const view = new FormView(formRenderer, errorHandler);
+    const submitter = new FormSubmitter(toastService);
+
+    return new ContactForm(validator, submitter, view);
+  }
+}
+
 let contactForm: ContactForm;
 
 document.addEventListener('DOMContentLoaded', () => {
-  contactForm = new ContactForm();
+  contactForm = ContactFormFactory.create();
   contactForm.init();
 });
 

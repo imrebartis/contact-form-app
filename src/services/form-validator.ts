@@ -1,8 +1,9 @@
 'use strict';
 
+import { IFormValidator } from '../interfaces/form-interfaces';
 import { FormElements } from '../types/form.types';
 
-export class FormValidator {
+export class FormValidator implements IFormValidator {
   validateField(
     fieldName: keyof FormElements,
     element: HTMLElement

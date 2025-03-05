@@ -1,14 +1,17 @@
-import { ErrorHandler } from '../services/error-handler';
-import { FormRenderer } from '../services/form-renderer';
+import {
+  IErrorHandler,
+  IFormRenderer,
+  IFormView,
+} from '../interfaces/form-interfaces';
 import { FormElementType, FormElements } from '../types/form.types';
 import { DOMUtils } from '../utils/dom-utils';
 
-export class FormView {
+export class FormView implements IFormView {
   protected form!: HTMLFormElement;
   protected elements!: FormElements;
   protected submitButton!: HTMLButtonElement;
-  protected formRenderer: FormRenderer;
-  protected errorHandler: ErrorHandler;
+  protected formRenderer: IFormRenderer;
+  protected errorHandler: IErrorHandler;
   protected abortController: AbortController;
   // Tracking for event listeners to make cleanup more reliable
   protected boundEventHandlers: Map<
@@ -20,13 +23,12 @@ export class FormView {
     }>
   > = new Map();
 
-  constructor(formRenderer?: FormRenderer, errorHandler?: ErrorHandler) {
-    this.formRenderer = formRenderer || new FormRenderer();
-    this.errorHandler = errorHandler || new ErrorHandler();
+  constructor(formRenderer: IFormRenderer, errorHandler: IErrorHandler) {
+    this.formRenderer = formRenderer;
+    this.errorHandler = errorHandler;
     this.abortController = new AbortController();
   }
 
-  // Add getter and setter for the abortController
   getAbortController(): AbortController {
     return this.abortController;
   }

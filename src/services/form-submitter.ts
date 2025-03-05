@@ -1,11 +1,11 @@
+import { IFormSubmitter, IToastService } from '../interfaces/form-interfaces';
 import { FormData } from '../types/form.types';
-import { ToastService } from './toast-service';
 
-export class FormSubmitter {
-  protected toastService: ToastService;
+export class FormSubmitter implements IFormSubmitter {
+  private toastService: IToastService;
 
-  constructor(toastService?: ToastService) {
-    this.toastService = toastService || new ToastService();
+  constructor(toastService: IToastService) {
+    this.toastService = toastService;
   }
 
   async submitForm(formData: FormData): Promise<void> {

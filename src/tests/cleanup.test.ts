@@ -8,7 +8,7 @@ import {
   vi,
 } from 'vitest';
 
-import { ContactForm } from '../main';
+import { ContactForm, ContactFormFactory } from '../main';
 import { FormRenderer } from '../services/form-renderer';
 
 type TestableContactForm = ContactForm & {
@@ -28,23 +28,19 @@ describe('ContactForm Cleanup', () => {
   let validateFieldSpy: ValidateFieldSpy;
 
   beforeEach(() => {
-    // Clear DOM and set up the form
     document.body.innerHTML = '';
+
     const renderer = new FormRenderer();
     formElement = renderer.renderForm();
     document.body.appendChild(formElement);
 
-    // Create the ContactForm instance
-    contactForm = new ContactForm();
+    contactForm = ContactFormFactory.create();
     testableForm = contactForm as unknown as TestableContactForm;
 
-    // Set up spy on validateField
     validateFieldSpy = vi.spyOn(testableForm, 'validateField');
 
-    // Initialize the form
     contactForm.init();
 
-    // Get references to form elements
     firstNameInput = document.getElementById('first-name') as HTMLInputElement;
     lastNameInput = document.getElementById('last-name') as HTMLInputElement;
     emailInput = document.getElementById('email') as HTMLInputElement;
