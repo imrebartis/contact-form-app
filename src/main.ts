@@ -4,6 +4,7 @@ import {
   IFormSubmitter,
   IFormValidator,
   IFormView,
+  IFormViewTesting,
 } from './interfaces/form-interfaces';
 import { ErrorHandler } from './services/error-handler';
 import { FormRenderer } from './services/form-renderer';
@@ -21,13 +22,18 @@ export class ContactForm {
   protected submitter: IFormSubmitter;
   protected elements!: FormElements;
 
+  // Simplify test access without exposing implementation details
+  forceCleanup(): void {
+    this.cleanup();
+  }
+
   // Getter and setter for testing purposes
   get abortController(): AbortController {
-    return this.view.getAbortController();
+    return (this.view as IFormViewTesting).getAbortController();
   }
 
   set abortController(controller: AbortController) {
-    this.view.setAbortController(controller);
+    (this.view as IFormViewTesting).setAbortController(controller);
   }
 
   constructor(

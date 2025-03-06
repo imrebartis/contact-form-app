@@ -29,21 +29,24 @@ export interface IFormSubmitter {
 
 export interface IFormView {
   createForm(): HTMLFormElement;
-  setupElements(): void;
-  getFormElements(): FormElements;
   setupEventListeners(
     submitHandler: (e: Event) => Promise<void>,
     validateFieldHandler: (fieldName: keyof FormElements) => boolean
   ): void;
-  getAbortController(): AbortController;
-  setAbortController(controller: AbortController): void;
+  getFormElements(): FormElements;
+  getForm(): HTMLFormElement;
+  getSubmitButton(): HTMLButtonElement;
   showFieldError(fieldName: keyof FormElements, errorMessage: string): void;
   disableSubmitButton(text: string): void;
   resetSubmitButton(): void;
   disableFormElements(): void;
   resetForm(): void;
   showFormError(message: string): void;
-  getForm(): HTMLFormElement;
-  getSubmitButton(): HTMLButtonElement;
   cleanup(): void;
+}
+
+// Interface for testing purposes
+export interface IFormViewTesting extends IFormView {
+  getAbortController(): AbortController;
+  setAbortController(controller: AbortController): void;
 }

@@ -2,26 +2,25 @@ import {
   IErrorHandler,
   IFormRenderer,
   IFormView,
+  IFormViewTesting,
 } from '../interfaces/form-interfaces';
 import { FormElementType, FormElements } from '../types/form.types';
 import { DOMUtils } from '../utils/dom-utils';
 
-export class FormView implements IFormView {
+export class FormView implements IFormView, IFormViewTesting {
   protected form!: HTMLFormElement;
   protected elements!: FormElements;
   protected submitButton!: HTMLButtonElement;
   protected formRenderer: IFormRenderer;
   protected errorHandler: IErrorHandler;
   protected abortController: AbortController;
-  // Tracking for event listeners to make cleanup more reliable
-  protected boundEventHandlers: Map<
-    EventTarget,
-    Array<{
-      type: string;
-      listener: EventListener;
-      signal: AbortSignal;
-    }>
-  > = new Map();
+
+  // Array to track listeners for explicit removal
+  private eventListeners: Array<{
+    element: EventTarget;
+    type: string;
+    handler: EventListener;
+  }> = [];
 
   constructor(formRenderer: IFormRenderer, errorHandler: IErrorHandler) {
     this.formRenderer = formRenderer;
@@ -69,25 +68,17 @@ export class FormView implements IFormView {
     submitHandler: (e: Event) => Promise<void>,
     validateFieldHandler: (fieldName: keyof FormElements) => boolean
   ): void {
-    const { signal } = this.abortController;
-
-    this.addEventListenerWithTracking(
-      this.form,
-      'submit',
-      submitHandler,
-      signal
-    );
+    this.addTrackedEventListener(this.form, 'submit', submitHandler);
 
     Object.entries(this.elements).forEach(([key, element]) => {
       if (key === 'queryType') {
         this.setupRadioGroupListeners(
           element as RadioNodeList,
           key,
-          validateFieldHandler,
-          signal
+          validateFieldHandler
         );
       } else {
-        this.setupInputListeners(element, key, validateFieldHandler, signal);
+        this.setupInputListeners(element, key, validateFieldHandler);
       }
     });
   }
@@ -95,19 +86,13 @@ export class FormView implements IFormView {
   setupRadioGroupListeners(
     radioNodeList: RadioNodeList,
     key: string,
-    validateFieldHandler: (fieldName: keyof FormElements) => boolean,
-    signal: AbortSignal
+    validateFieldHandler: (fieldName: keyof FormElements) => boolean
   ): void {
     Array.from(radioNodeList).forEach((radio) => {
       if (radio instanceof HTMLInputElement) {
         const boundHandler = () =>
           validateFieldHandler(key as keyof FormElements);
-        this.addEventListenerWithTracking(
-          radio,
-          'change',
-          boundHandler,
-          signal
-        );
+        this.addTrackedEventListener(radio, 'change', boundHandler);
       }
     });
   }
@@ -115,31 +100,26 @@ export class FormView implements IFormView {
   setupInputListeners(
     element: EventTarget,
     key: string,
-    validateFieldHandler: (fieldName: keyof FormElements) => boolean,
-    signal: AbortSignal
+    validateFieldHandler: (fieldName: keyof FormElements) => boolean
   ): void {
     const boundHandler = () => validateFieldHandler(key as keyof FormElements);
-    this.addEventListenerWithTracking(element, 'input', boundHandler, signal);
-    this.addEventListenerWithTracking(element, 'blur', boundHandler, signal);
+    this.addTrackedEventListener(element, 'input', boundHandler);
+    this.addTrackedEventListener(element, 'blur', boundHandler);
   }
 
-  private addEventListenerWithTracking(
+  // Helper method to track event listeners for proper cleanup
+  private addTrackedEventListener(
     element: EventTarget,
     type: string,
-    listener: EventListener,
-    signal: AbortSignal
+    handler: EventListener
   ): void {
-    if (!this.boundEventHandlers.has(element)) {
-      this.boundEventHandlers.set(element, []);
-    }
+    // Store reference for explicit removal during cleanup
+    this.eventListeners.push({ element, type, handler });
 
-    this.boundEventHandlers.get(element)?.push({
-      type,
-      listener,
-      signal,
+    // Use AbortController for backup cleanup
+    element.addEventListener(type, handler, {
+      signal: this.abortController.signal,
     });
-
-    element.addEventListener(type, listener, { signal });
   }
 
   getFormElements(): FormElements {
@@ -200,14 +180,11 @@ export class FormView implements IFormView {
   cleanup(): void {
     this.abortController.abort();
 
-    // Manually remove all tracked event listeners as a fallback
-    this.boundEventHandlers.forEach((handlers, element) => {
-      handlers.forEach(({ type, listener }) => {
-        element.removeEventListener(type, listener);
-      });
+    this.eventListeners.forEach(({ element, type, handler }) => {
+      element.removeEventListener(type, handler);
     });
 
-    this.boundEventHandlers.clear();
+    this.eventListeners = [];
 
     this.abortController = new AbortController();
   }
