@@ -1,5 +1,7 @@
 'use strict';
 
+import DOMPurify from 'dompurify';
+
 import {
   IFormSubmitter,
   IFormValidator,
@@ -117,11 +119,13 @@ export class ContactForm {
 
   protected collectFormData(): FormData {
     return {
-      firstName: this.elements.firstName.value,
-      lastName: this.elements.lastName.value,
-      email: this.elements.email.value,
-      queryType: (this.elements.queryType as RadioNodeList).value,
-      message: this.elements.message.value,
+      firstName: DOMPurify.sanitize(this.elements.firstName.value),
+      lastName: DOMPurify.sanitize(this.elements.lastName.value),
+      email: DOMPurify.sanitize(this.elements.email.value),
+      queryType: DOMPurify.sanitize(
+        (this.elements.queryType as RadioNodeList).value
+      ),
+      message: DOMPurify.sanitize(this.elements.message.value),
       consent: this.elements.consent.checked,
     };
   }

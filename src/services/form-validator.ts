@@ -1,5 +1,8 @@
 'use strict';
 
+import DOMPurify from 'dompurify';
+import validator from 'validator';
+
 import { IFormValidator } from '../interfaces/form-interfaces';
 import { FormElements } from '../types/form.types';
 
@@ -14,26 +17,35 @@ export class FormValidator implements IFormValidator {
     switch (fieldName) {
       case 'firstName':
       case 'lastName':
-        isValid = (element as HTMLInputElement).value.trim().length > 0;
+        isValid =
+          DOMPurify.sanitize((element as HTMLInputElement).value.trim())
+            .length > 0;
         errorMessage = isValid ? '' : 'This field is required';
         break;
 
       case 'email':
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const value = (element as HTMLInputElement).value;
-        isValid = emailRegex.test(value);
-        errorMessage = isValid ? '' : 'Please enter a valid email address';
-        if (!value) errorMessage = 'This field is required';
+        const value = DOMPurify.sanitize((element as HTMLInputElement).value);
+        if (!value.trim()) {
+          isValid = false;
+          errorMessage = 'This field is required';
+        } else {
+          isValid = validator.isEmail(value);
+          errorMessage = isValid ? '' : 'Please enter a valid email address';
+        }
         break;
 
       case 'queryType':
-        const selectedRadio = (element as unknown as RadioNodeList).value;
+        const selectedRadio = DOMPurify.sanitize(
+          (element as unknown as RadioNodeList).value
+        );
         isValid = selectedRadio !== '';
         errorMessage = isValid ? '' : 'Please select a query type';
         break;
 
       case 'message':
-        isValid = (element as HTMLTextAreaElement).value.trim().length > 0;
+        isValid =
+          DOMPurify.sanitize((element as HTMLTextAreaElement).value.trim())
+            .length > 0;
         errorMessage = isValid ? '' : 'This field is required';
         break;
 
