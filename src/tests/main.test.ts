@@ -1,20 +1,32 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { IFormSubmitter } from '../interfaces/form-interfaces';
 import { ContactForm, ContactFormFactory } from '../main';
 import { FormRenderer } from '../services/form-renderer';
 
 describe('ContactForm', () => {
   let contactForm: ContactForm;
   let formElement: HTMLFormElement;
+  let renderer: FormRenderer;
+  let mockSubmitter: IFormSubmitter;
 
   beforeEach(() => {
     document.body.innerHTML = '';
 
-    const renderer = new FormRenderer();
+    renderer = new FormRenderer();
     formElement = renderer.renderForm();
     document.body.appendChild(formElement);
 
-    contactForm = ContactFormFactory.create();
+    // mock submitter for better test isolation
+    mockSubmitter = {
+      submitForm: vi.fn().mockResolvedValue(undefined),
+      showSuccessMessage: vi.fn(),
+    };
+
+    contactForm = ContactFormFactory.create({
+      formRenderer: renderer,
+      submitter: mockSubmitter,
+    });
   });
 
   afterEach(() => {
@@ -68,7 +80,10 @@ describe('ContactForm', () => {
   it('should disable all form elements after successful submission', async () => {
     vi.useFakeTimers();
 
-    const contactForm = ContactFormFactory.create();
+    const contactForm = ContactFormFactory.create({
+      formRenderer: renderer,
+      submitter: mockSubmitter,
+    });
     contactForm.init();
 
     const form = document.querySelector('form') as HTMLFormElement;
@@ -93,6 +108,9 @@ describe('ContactForm', () => {
     // Fast-forward timer to simulate network delay
     vi.advanceTimersByTime(1600);
     await vi.runAllTimersAsync();
+
+    expect(mockSubmitter.submitForm).toHaveBeenCalledTimes(1);
+    expect(mockSubmitter.showSuccessMessage).toHaveBeenCalledTimes(1);
 
     expect(firstName.disabled).toBe(true);
     expect(lastName.disabled).toBe(true);

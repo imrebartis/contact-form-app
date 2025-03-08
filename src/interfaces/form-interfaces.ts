@@ -44,9 +44,3 @@ export interface IFormView {
   showFormError(message: string): void;
   cleanup(): void;
 }
-
-// Interface for testing purposes
-export interface IFormViewTesting extends IFormView {
-  getAbortController(): AbortController;
-  setAbortController(controller: AbortController): void;
-}

@@ -13,7 +13,6 @@ import { FormRenderer } from '../services/form-renderer';
 
 type TestableContactForm = ContactForm & {
   validateField: (fieldName: string) => boolean;
-  abortController: AbortController;
 };
 
 type ValidateFieldSpy = MockInstance<[fieldName: string], boolean>;
@@ -26,15 +25,26 @@ describe('ContactForm Cleanup', () => {
   let lastNameInput: HTMLInputElement;
   let emailInput: HTMLInputElement;
   let validateFieldSpy: ValidateFieldSpy;
+  let renderer: FormRenderer;
+  let abortController: AbortController;
 
   beforeEach(() => {
     document.body.innerHTML = '';
 
-    const renderer = new FormRenderer();
+    // Create a mocked AbortController for each test
+    abortController = {
+      signal: new AbortController().signal,
+      abort: vi.fn(),
+    } as unknown as AbortController;
+
+    renderer = new FormRenderer();
     formElement = renderer.renderForm();
     document.body.appendChild(formElement);
 
-    contactForm = ContactFormFactory.create();
+    contactForm = ContactFormFactory.create({
+      formRenderer: renderer,
+      abortController: abortController,
+    });
     testableForm = contactForm as unknown as TestableContactForm;
 
     validateFieldSpy = vi.spyOn(testableForm, 'validateField');
@@ -56,6 +66,8 @@ describe('ContactForm Cleanup', () => {
     validateFieldSpy.mockClear();
 
     contactForm.cleanup();
+
+    expect(abortController.abort).toHaveBeenCalledTimes(1);
 
     // Small delay to ensure abort signal propagates in test environment
     await vi.runAllTimersAsync();
@@ -99,19 +111,6 @@ describe('ContactForm Cleanup', () => {
     expect(validateFieldSpy).toHaveBeenCalledTimes(1);
   }, 10000);
 
-  it('should create a new AbortController after cleanup', () => {
-    const originalController = testableForm.abortController;
-
-    const abortSpy = vi.spyOn(originalController, 'abort');
-
-    contactForm.cleanup();
-
-    expect(abortSpy).toHaveBeenCalledTimes(1);
-
-    // The controller should be different after cleanup
-    expect(testableForm.abortController).not.toBe(originalController);
-  });
-
   it('should not respond to events from previous initialization after reinitialization', () => {
     const firstInput = firstNameInput.cloneNode(true) as HTMLInputElement;
     document.body.appendChild(firstInput);
@@ -142,15 +141,7 @@ describe('ContactForm Cleanup', () => {
   });
 
   it('should properly abort the controller when cleanup is called', () => {
-    const mockAbortController = {
-      signal: new AbortController().signal,
-      abort: vi.fn<[], void>(),
-    };
-
-    testableForm.abortController = mockAbortController;
-
     contactForm.cleanup();
-
-    expect(mockAbortController.abort).toHaveBeenCalledTimes(1);
+    expect(abortController.abort).toHaveBeenCalledTimes(1);
   });
 });

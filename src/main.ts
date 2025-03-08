@@ -6,7 +6,6 @@ import {
   IFormSubmitter,
   IFormValidator,
   IFormView,
-  IFormViewTesting,
 } from './interfaces/form-interfaces';
 import { ErrorHandler } from './services/error-handler';
 import { FormRenderer } from './services/form-renderer';
@@ -24,18 +23,8 @@ export class ContactForm {
   protected submitter: IFormSubmitter;
   protected elements!: FormElements;
 
-  // Simplify test access without exposing implementation details
-  forceCleanup(): void {
-    this.cleanup();
-  }
-
-  // Getter and setter for testing purposes
-  get abortController(): AbortController {
-    return (this.view as IFormViewTesting).getAbortController();
-  }
-
-  set abortController(controller: AbortController) {
-    (this.view as IFormViewTesting).setAbortController(controller);
+  cleanup(): void {
+    this.view.cleanup();
   }
 
   constructor(
@@ -147,36 +136,86 @@ export class ContactForm {
     this.view.showFormError('Failed to send message. Please try again.');
     this.view.resetSubmitButton();
   }
+}
 
-  cleanup(): void {
-    this.view.cleanup();
-  }
+interface ContactFormFactoryConfig {
+  validator?: IFormValidator;
+  formRenderer?: FormRenderer;
+  errorHandler?: ErrorHandler;
+  toastService?: ToastService;
+  view?: IFormView;
+  submitter?: IFormSubmitter;
+  abortController?: AbortController;
 }
 
 // Factory to create fully configured ContactForm
 export class ContactFormFactory {
-  static create(): ContactForm {
-    const validator = new FormValidator();
-    const toastService = new ToastService();
-    const errorHandler = new ErrorHandler();
-    const formRenderer = new FormRenderer();
+  static create(config: ContactFormFactoryConfig = {}): ContactForm {
+    const validator = config.validator || new FormValidator();
+    const toastService = config.toastService || new ToastService();
+    const errorHandler = config.errorHandler || new ErrorHandler();
+    const formRenderer = config.formRenderer || new FormRenderer();
 
-    const view = new FormView(formRenderer, errorHandler);
-    const submitter = new FormSubmitter(toastService);
+    const view =
+      config.view ||
+      new FormView(formRenderer, errorHandler, config.abortController);
+    const submitter = config.submitter || new FormSubmitter(toastService);
 
     return new ContactForm(validator, submitter, view);
   }
 }
 
-let contactForm: ContactForm;
+export class ContactFormApp {
+  private static instance: ContactFormApp | null = null;
+  private contactForm: ContactForm | null = null;
+
+  private constructor() {
+    // Private constructor to enforce singleton pattern
+  }
+
+  /**
+   * Get the singleton instance of the ContactFormApp
+   */
+  public static getInstance(): ContactFormApp {
+    if (!ContactFormApp.instance) {
+      ContactFormApp.instance = new ContactFormApp();
+    }
+    return ContactFormApp.instance;
+  }
+
+  public init(): void {
+    // Clean up any existing form
+    this.cleanup();
+
+    this.contactForm = ContactFormFactory.create();
+    this.contactForm.init();
+
+    // Setup cleanup on page unload
+    this.setupUnloadCleanup();
+  }
+
+  public cleanup(): void {
+    if (this.contactForm) {
+      this.contactForm.cleanup();
+      this.contactForm = null;
+    }
+  }
+
+  private setupUnloadCleanup(): void {
+    window.addEventListener('beforeunload', () => {
+      this.cleanup();
+    });
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-  contactForm = ContactFormFactory.create();
-  contactForm.init();
+  ContactFormApp.getInstance().init();
 });
 
-window.addEventListener('beforeunload', () => {
-  if (contactForm) {
-    contactForm.cleanup();
-  }
-});
+export function initContactForm(): void {
+  ContactFormApp.getInstance().init();
+}
+
+export function cleanupContactForm(): void {
+  ContactFormApp.getInstance().cleanup();
+}
