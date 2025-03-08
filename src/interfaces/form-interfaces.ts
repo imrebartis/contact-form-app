@@ -23,7 +23,7 @@ export interface IToastService {
 }
 
 export interface IFormSubmitter {
-  submitForm(formData: FormData): Promise<void>;
+  submitForm(formData: FormData, signal?: AbortSignal): Promise<void>;
   showSuccessMessage(): void;
 }
 
@@ -36,6 +36,7 @@ export interface IFormView {
   getFormElements(): FormElements;
   getForm(): HTMLFormElement;
   getSubmitButton(): HTMLButtonElement;
+  getAbortSignal(): AbortSignal;
   showFieldError(fieldName: keyof FormElements, errorMessage: string): void;
   disableSubmitButton(text: string): void;
   resetSubmitButton(): void;

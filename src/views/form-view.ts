@@ -15,13 +15,9 @@ export class FormView implements IFormView {
   protected abortController: AbortController;
 
   private isExternalController(): boolean {
-    // If there is a signal property that's not aborted despite calling abort(),
-    // it's likely a mock controller provided for testing
-    return (
-      this.abortController &&
-      'signal' in this.abortController &&
-      !this.abortController.signal.aborted
-    );
+    // If the signal exists and isn't aborted
+    // despite calling abort(), it's likely a mock controller provided for testing
+    return this.abortController?.signal && !this.abortController.signal.aborted;
   }
 
   // Array to track listeners for explicit removal
@@ -137,6 +133,10 @@ export class FormView implements IFormView {
 
   getSubmitButton(): HTMLButtonElement {
     return this.submitButton;
+  }
+
+  getAbortSignal(): AbortSignal {
+    return this.abortController.signal;
   }
 
   showFieldError(fieldName: keyof FormElements, errorMessage: string): void {

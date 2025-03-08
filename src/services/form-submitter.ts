@@ -8,8 +8,20 @@ export class FormSubmitter implements IFormSubmitter {
     this.toastService = toastService;
   }
 
-  async submitForm(formData: FormData): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+  async submitForm(formData: FormData, signal?: AbortSignal): Promise<void> {
+    // Create a promise that can be aborted
+    await new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(resolve, 1500);
+
+      // If provided, handle abort signal
+      if (signal) {
+        signal.addEventListener('abort', () => {
+          clearTimeout(timeoutId);
+          reject(new DOMException('Form submission aborted', 'AbortError'));
+        });
+      }
+    });
+
     console.log('Form submitted:', formData);
   }
 

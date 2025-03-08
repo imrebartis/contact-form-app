@@ -95,13 +95,23 @@ export class ContactForm {
   }
 
   protected async submitForm(): Promise<void> {
+    const abortSignal = this.view.getAbortSignal();
+    if (abortSignal?.aborted) {
+      console.log('Form submission aborted before starting');
+      return;
+    }
+
     this.view.disableSubmitButton('Sending...');
 
     try {
       const formData = this.collectFormData();
-      await this.submitter.submitForm(formData);
+      await this.submitter.submitForm(formData, abortSignal);
       this.handleSuccessfulSubmission();
     } catch (error: unknown) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.log('Form submission was aborted during processing');
+        return; // Don't show error for intentional aborts
+      }
       this.handleFailedSubmission(error);
     }
   }
