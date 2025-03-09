@@ -7,13 +7,29 @@ interface ElementRetrievalOptions {
 
 export class DOMUtils {
   static getElement<T extends HTMLElement>(
-    selector: string,
+    selector: string | { id: string } | { form: HTMLFormElement; name: string },
     options: ElementRetrievalOptions = { throwIfNotFound: true }
   ): T | null {
-    const element = document.querySelector<T>(selector);
+    let element: T | null = null;
+    let errorDetails = '';
+
+    if (typeof selector === 'string') {
+      // CSS selector strategy
+      element = document.querySelector<T>(selector);
+      errorDetails = `Element not found: ${selector}`;
+    } else if ('id' in selector) {
+      // ID strategy
+      element = document.getElementById(selector.id) as T | null;
+      errorDetails = `Element not found with ID: ${selector.id}`;
+    } else if ('form' in selector && 'name' in selector) {
+      // Form element by name strategy
+      const namedItem = selector.form.elements.namedItem(selector.name);
+      element = namedItem as T | null;
+      errorDetails = `Element not found with name: ${selector.name} in form`;
+    }
 
     if (!element && options.throwIfNotFound) {
-      throw new Error(options.errorMessage || `Element not found: ${selector}`);
+      throw new Error(options.errorMessage || errorDetails);
     }
 
     return element;
@@ -35,22 +51,15 @@ export class DOMUtils {
     id: string,
     options: ElementRetrievalOptions = { throwIfNotFound: false }
   ): T | null {
-    const element = document.getElementById(id) as T | null;
-
-    if (!element && options.throwIfNotFound) {
-      throw new Error(
-        options.errorMessage || `Element not found with ID: ${id}`
-      );
-    }
-
-    return element;
+    return this.getElement<T>({ id }, options);
   }
 
-  static getElementByName(
+  static getElementByName<T extends Element | RadioNodeList>(
     form: HTMLFormElement,
-    name: string
-  ): Element | RadioNodeList | null {
-    return form.elements.namedItem(name);
+    name: string,
+    options: ElementRetrievalOptions = { throwIfNotFound: false }
+  ): T | null {
+    return this.getElement<HTMLElement>({ form, name }, options) as T | null;
   }
 
   static getErrorContainer(

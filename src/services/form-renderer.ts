@@ -55,7 +55,7 @@ export class FormRenderer implements IFormRenderer {
           </div>
 
           <div class="form-group">
-            <fieldset class="radio-group">
+            <fieldset class="radio-group" aria-required="true" aria-describedby="query-type-error">
               <legend id="label-legend">
                 <span class="label-text" id="query-type-label">Query Type&nbsp;</span>
                 <span class="required" aria-hidden="true">*</span>
@@ -99,7 +99,7 @@ export class FormRenderer implements IFormRenderer {
           </div>
 
           <div class="form-group">
-            <div class="checkbox-container" role="group">
+            <div class="checkbox-container" role="group" aria-describedby="consent-error">
               <input
                 type="checkbox"
                 id="consent"
@@ -115,7 +115,7 @@ export class FormRenderer implements IFormRenderer {
             </div>
           </div>
 
-          <button type="submit">Submit</button>
+          <button type="submit" aria-label="Submit contact form">Submit</button>
         </form>
       </main>
     `;
