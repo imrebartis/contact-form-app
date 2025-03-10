@@ -6,7 +6,18 @@ import validator from 'validator';
 import { IFormValidator } from '../interfaces/form-interfaces';
 import { FormElements } from '../types/form.types';
 
+/**
+ * Validates form field inputs according to specific validation rules
+ * Implements the IFormValidator interface to ensure proper form validation
+ */
 export class FormValidator implements IFormValidator {
+  /**
+   * Validates a form field based on its field name
+   *
+   * @param fieldName - The name of the field to validate (must be a key of FormElements)
+   * @param element - The HTML element to validate
+   * @returns ValidationResult object containing validation status and error message
+   */
   validateField(
     fieldName: keyof FormElements,
     element: HTMLElement
@@ -61,7 +72,12 @@ export class FormValidator implements IFormValidator {
   }
 }
 
+/**
+ * Result of a form field validation
+ */
 interface ValidationResult {
+  /** Whether the field passed validation */
   isValid: boolean;
+  /** Error message to display if validation failed, empty string if validation passed */
   errorMessage: string;
 }

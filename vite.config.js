@@ -4,12 +4,26 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   base: '/contact-form-app/',
   build: {
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV !== 'production',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: process.env.NODE_ENV === 'production',
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+    reportCompressedSize: false, // Speed up builds
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
       },
       output: {
+        manualChunks: (id) => {
+          // Dynamically create chunks based on node_modules
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'noscript.css') {
             return 'assets/[name][extname]';
@@ -23,7 +37,7 @@ export default defineConfig({
     outDir: 'dist',
   },
   css: {
-    devSourcemap: true,
+    devSourcemap: process.env.NODE_ENV !== 'production',
     preprocessorOptions: {
       scss: {
         additionalData: `
@@ -31,6 +45,9 @@ export default defineConfig({
         `,
       },
     },
+  },
+  optimizeDeps: {
+    // No specific dependencies listed, will be auto-detected
   },
   setupFiles: ['./src/tests/setup.ts'],
   environmentOptions: {

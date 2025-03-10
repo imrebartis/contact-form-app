@@ -17,16 +17,37 @@ import { FormView } from './views/form-view';
 
 import './styles/style.scss';
 
+/**
+ * Main class for handling contact form functionality
+ * Manages form validation, submission and state
+ */
 export class ContactForm {
+  /** View handling UI interactions and rendering */
   protected view: IFormView;
+
+  /** Validator for form field validation */
   protected validator: IFormValidator;
+
+  /** Service for handling form submission */
   protected submitter: IFormSubmitter;
+
+  /** Form elements references */
   protected elements!: FormElements;
 
+  /**
+   * Cleans up resources and event listeners
+   */
   cleanup(): void {
     this.view.cleanup();
   }
 
+  /**
+   * Initializes the Contact Form with required dependencies
+   *
+   * @param validator - Service for validating form fields
+   * @param submitter - Service for submitting form data
+   * @param view - Service for rendering and managing the form UI
+   */
   constructor(
     validator: IFormValidator,
     submitter: IFormSubmitter,
@@ -37,6 +58,12 @@ export class ContactForm {
     this.view = view;
   }
 
+  /**
+   * Initializes the form: creates the form in the DOM,
+   * gets references to form elements, and sets up event listeners
+   *
+   * @throws Error if initialization fails
+   */
   init(): void {
     try {
       this.view.createForm();
@@ -53,6 +80,12 @@ export class ContactForm {
     }
   }
 
+  /**
+   * Validates a specific form field
+   *
+   * @param fieldName - Name of the field to validate
+   * @returns boolean indicating whether the field is valid
+   */
   protected validateField(fieldName: keyof FormElements): boolean {
     const element = this.elements[fieldName];
     const { isValid, errorMessage } = this.validator.validateField(
@@ -64,6 +97,12 @@ export class ContactForm {
     return isValid;
   }
 
+  /**
+   * Handles form submission event
+   * Prevents default behavior, validates all fields and submits if valid
+   *
+   * @param e - Form submission event
+   */
   protected async handleSubmit(e: Event): Promise<void> {
     e.preventDefault();
 
@@ -79,6 +118,11 @@ export class ContactForm {
     }
   }
 
+  /**
+   * Validates all form fields and returns overall validation status
+   *
+   * @returns boolean indicating whether all fields are valid
+   */
   protected validateAllFields(): boolean {
     let allValid = true;
 
@@ -123,6 +167,11 @@ export class ContactForm {
     }
   }
 
+  /**
+   * Collects and sanitizes all form data into a FormData object
+   *
+   * @returns Sanitized form data ready for submission
+   */
   protected collectFormData(): FormData {
     return {
       firstName: DOMPurify.sanitize(this.elements.firstName.value),
@@ -136,6 +185,9 @@ export class ContactForm {
     };
   }
 
+  /**
+   * Manages successful form submission UI updates
+   */
   protected handleSuccessfulSubmission(): void {
     this.submitter.showSuccessMessage();
     this.view.disableFormElements();
@@ -143,6 +195,11 @@ export class ContactForm {
     this.view.disableSubmitButton('Sent');
   }
 
+  /**
+   * Manages failed form submission UI updates and error handling
+   *
+   * @param error - Optional error object from submission failure
+   */
   protected handleFailedSubmission(error?: unknown): void {
     if (error instanceof Error) {
       console.error(error.message);
@@ -155,6 +212,9 @@ export class ContactForm {
   }
 }
 
+/**
+ * Configuration options for creating a ContactForm instance
+ */
 interface ContactFormFactoryConfig {
   validator?: IFormValidator;
   formRenderer?: FormRenderer;
@@ -165,8 +225,17 @@ interface ContactFormFactoryConfig {
   abortController?: AbortController;
 }
 
-// Factory to create fully configured ContactForm
+/**
+ * Factory for creating fully configured ContactForm instances
+ * Uses dependency injection to provide required services
+ */
 export class ContactFormFactory {
+  /**
+   * Creates a new ContactForm with default or provided dependencies
+   *
+   * @param config - Optional configuration to override default dependencies
+   * @returns Fully configured ContactForm instance
+   */
   static create(config: ContactFormFactoryConfig = {}): ContactForm {
     const validator = config.validator || new FormValidator();
     const toastService = config.toastService || new ToastService();

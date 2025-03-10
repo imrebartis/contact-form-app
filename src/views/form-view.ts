@@ -6,6 +6,29 @@ import {
 import { FormElementType, FormElements } from '../types/form.types';
 import { DOMUtils } from '../utils/dom-utils';
 
+const FormEvents = {
+  Input: 'input',
+  Blur: 'blur',
+  Change: 'change',
+  Submit: 'submit',
+};
+
+const FormElementIds = {
+  FirstName: 'first-name',
+  LastName: 'last-name',
+  Email: 'email',
+  Message: 'message',
+  Consent: 'consent',
+};
+
+const FormElementNames = {
+  QueryType: 'query-type',
+};
+
+const ButtonLabels = {
+  Submit: 'Submit',
+};
+
 export class FormView implements IFormView {
   protected form!: HTMLFormElement;
   protected elements!: FormElements;
@@ -43,15 +66,23 @@ export class FormView implements IFormView {
 
   setupElements(): void {
     this.elements = {
-      firstName: DOMUtils.getElementById('first-name') as HTMLInputElement,
-      lastName: DOMUtils.getElementById('last-name') as HTMLInputElement,
-      email: DOMUtils.getElementById('email') as HTMLInputElement,
+      firstName: DOMUtils.getElementById(
+        FormElementIds.FirstName
+      ) as HTMLInputElement,
+      lastName: DOMUtils.getElementById(
+        FormElementIds.LastName
+      ) as HTMLInputElement,
+      email: DOMUtils.getElementById(FormElementIds.Email) as HTMLInputElement,
       queryType: DOMUtils.getElementByName(
         this.form,
-        'query-type'
+        FormElementNames.QueryType
       ) as RadioNodeList,
-      message: DOMUtils.getElementById('message') as HTMLTextAreaElement,
-      consent: DOMUtils.getElementById('consent') as HTMLInputElement,
+      message: DOMUtils.getElementById(
+        FormElementIds.Message
+      ) as HTMLTextAreaElement,
+      consent: DOMUtils.getElementById(
+        FormElementIds.Consent
+      ) as HTMLInputElement,
     };
     this.submitButton = this.form.querySelector('button') as HTMLButtonElement;
 
@@ -103,7 +134,7 @@ export class FormView implements IFormView {
     submitHandler: (e: Event) => Promise<void>,
     validateFieldHandler: (fieldName: keyof FormElements) => boolean
   ): void {
-    this.form.addEventListener('submit', submitHandler, {
+    this.form.addEventListener(FormEvents.Submit, submitHandler, {
       signal: this.abortController.signal,
     });
 
@@ -122,19 +153,19 @@ export class FormView implements IFormView {
     validateFieldHandler: (fieldName: keyof FormElements) => boolean
   ): void {
     this.form.addEventListener(
-      'input',
+      FormEvents.Input,
       (event) => this.handleDelegatedEvent(event, validateFieldHandler),
       { signal: this.abortController.signal }
     );
 
     this.form.addEventListener(
-      'blur',
+      FormEvents.Blur,
       (event) => this.handleDelegatedEvent(event, validateFieldHandler),
       { signal: this.abortController.signal, capture: true }
     );
 
     this.form.addEventListener(
-      'change',
+      FormEvents.Change,
       (event) => this.handleDelegatedEvent(event, validateFieldHandler),
       { signal: this.abortController.signal }
     );
@@ -175,7 +206,7 @@ export class FormView implements IFormView {
         Array.from(element).forEach((radio) => {
           if (radio instanceof HTMLInputElement) {
             radio.addEventListener(
-              'change',
+              FormEvents.Change,
               () => {
                 if (this.isActive) {
                   validateFieldHandler(fieldName as keyof FormElements);
@@ -190,7 +221,7 @@ export class FormView implements IFormView {
         element instanceof HTMLTextAreaElement
       ) {
         element.addEventListener(
-          'input',
+          FormEvents.Input,
           () => {
             if (this.isActive) {
               validateFieldHandler(fieldName as keyof FormElements);
@@ -200,7 +231,7 @@ export class FormView implements IFormView {
         );
 
         element.addEventListener(
-          'blur',
+          FormEvents.Blur,
           () => {
             if (this.isActive) {
               validateFieldHandler(fieldName as keyof FormElements);
@@ -251,7 +282,7 @@ export class FormView implements IFormView {
 
   resetSubmitButton(): void {
     this.submitButton.disabled = false;
-    this.submitButton.textContent = 'Submit';
+    this.submitButton.textContent = ButtonLabels.Submit;
   }
 
   disableFormElements(): void {
