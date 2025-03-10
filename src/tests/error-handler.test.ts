@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { ErrorHandler } from '../services/error-handler';
+import { ErrorHandler } from '../services/form-handling/error-handler';
 
 describe('ErrorHandler', () => {
   let errorHandler: ErrorHandler;

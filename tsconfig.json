@@ -14,13 +14,10 @@
       "jest"
     ],
     "skipLibCheck": true,
-    /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
-    "moduleDetection": "force",
     "noEmit": true,
-    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -28,5 +25,7 @@
   },
   "include": [
     "src"
-  ]
+  ],
+  "allowSyntheticDefaultImports": true,
+  "extends": "./tsconfig.node.json"
 }

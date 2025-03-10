@@ -1,5 +1,8 @@
-import { IFormSubmitter, IToastService } from '../interfaces/form-interfaces';
-import { FormData } from '../types/form.types';
+import {
+  IFormSubmitter,
+  IToastService,
+} from '../../interfaces/form-interfaces';
+import { FormData } from '../../types/form.types';
 
 /**
  * Handles form submission operations and success notifications

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { IFormSubmitter } from '../interfaces/form-interfaces';
 import { ContactForm, ContactFormFactory } from '../main';
-import { FormRenderer } from '../services/form-renderer';
+import { FormRenderer } from '../services/form-handling/form-renderer';
 
 describe('ContactForm', () => {
   let contactForm: ContactForm;

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { FormValidator } from '../services/form-validator';
+import { FormValidator } from '../services/validation/form-validator';
 
 describe('FormValidator', () => {
   let validator: FormValidator;

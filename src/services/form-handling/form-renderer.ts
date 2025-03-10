@@ -1,6 +1,6 @@
 'use strict';
 
-import { IFormRenderer } from '../interfaces/form-interfaces';
+import { IFormRenderer } from '../../interfaces/form-interfaces';
 
 export class FormRenderer implements IFormRenderer {
   renderForm(): HTMLFormElement {

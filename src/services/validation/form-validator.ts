@@ -3,8 +3,8 @@
 import DOMPurify from 'dompurify';
 import validator from 'validator';
 
-import { IFormValidator } from '../interfaces/form-interfaces';
-import { FormElements } from '../types/form.types';
+import { IFormValidator } from '../../interfaces/form-interfaces';
+import { FormElements } from '../../types/form.types';
 
 /**
  * Validates form field inputs according to specific validation rules

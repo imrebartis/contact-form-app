@@ -9,7 +9,7 @@ import {
 } from 'vitest';
 
 import { ContactForm, ContactFormFactory } from '../main';
-import { FormRenderer } from '../services/form-renderer';
+import { FormRenderer } from '../services/form-handling/form-renderer';
 
 type TestableContactForm = ContactForm & {
   validateField: (fieldName: string) => boolean;

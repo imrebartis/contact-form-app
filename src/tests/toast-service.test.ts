@@ -2,7 +2,7 @@ import Toastify from 'toastify-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import successIcon from '../assets/images/icon-success-check.svg';
-import { ToastService } from '../services/toast-service';
+import { ToastService } from '../services/form-handling/toast-service';
 
 vi.mock('toastify-js');
 vi.mock('../assets/images/icon-success-check.svg', () => ({

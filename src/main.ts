@@ -7,11 +7,11 @@ import {
   IFormValidator,
   IFormView,
 } from './interfaces/form-interfaces';
-import { ErrorHandler } from './services/error-handler';
-import { FormRenderer } from './services/form-renderer';
-import { FormSubmitter } from './services/form-submitter';
-import { FormValidator } from './services/form-validator';
-import { ToastService } from './services/toast-service';
+import { ErrorHandler } from './services/form-handling/error-handler';
+import { FormRenderer } from './services/form-handling/form-renderer';
+import { FormSubmitter } from './services/form-handling/form-submitter';
+import { ToastService } from './services/form-handling/toast-service';
+import { FormValidator } from './services/validation/form-validator';
 import { FormData, FormElements } from './types/form.types';
 import { FormView } from './views/form-view';
 

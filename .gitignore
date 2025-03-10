@@ -12,6 +12,8 @@ dist
 dist-ssr
 coverage
 *.local
+tsconfig.tsbuildinfo
+memory-bank
 
 # Editor directories and files
 .vscode/*
