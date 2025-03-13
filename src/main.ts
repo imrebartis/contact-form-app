@@ -106,14 +106,11 @@ export class ContactForm {
   protected async handleSubmit(e: Event): Promise<void> {
     e.preventDefault();
 
-    const submitButton = this.view.getSubmitButton();
-    if (submitButton.disabled) {
+    if (this.view.getSubmitButton().disabled) {
       return;
     }
 
-    const isValid = this.validateAllFields();
-
-    if (isValid) {
+    if (this.validateAllFields()) {
       await this.submitForm();
     }
   }
@@ -138,33 +135,46 @@ export class ContactForm {
     return allValid;
   }
 
+  /**
+   * Handles the form submission process
+   * Collects form data, submits it, and handles success or failure
+   */
   protected async submitForm(): Promise<void> {
+    const abortSignal = this.view.getAbortSignal();
+    /**
+     * The abort signal may be null:
+     * - When no AbortController was provided during form initialization
+     * - When the view implementation doesn't support abort functionality
+     */
+    if (abortSignal?.aborted) {
+      console.log('Form submission aborted before starting');
+      return;
+    }
+
+    this.view.disableSubmitButton('Sending...');
+
     try {
-      const abortSignal = this.view.getAbortSignal();
-      /**
-       * The abort signal may be null:
-       * - When no AbortController was provided during form initialization
-       * - When the view implementation doesn't support abort functionality
-       */
-      if (abortSignal?.aborted) {
-        console.log('Form submission aborted before starting');
-        return;
-      }
-
-      this.view.disableSubmitButton('Sending...');
-
       const formData = this.collectFormData();
       await this.submitter.submitForm(formData, abortSignal);
       this.handleSuccessfulSubmission();
     } catch (error: unknown) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        console.log('Form submission was aborted during processing');
-        // Reset the submit button state after an abort
-        this.view.resetSubmitButton();
-        return; // Don't show error for intentional aborts
-      }
-      this.handleFailedSubmission(error);
+      this.handleSubmissionError(error);
     }
+  }
+
+  /**
+   * Handles errors that occur during form submission
+   *
+   * @param error - The error object from the submission failure
+   */
+  protected handleSubmissionError(error: unknown): void {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      console.log('Form submission was aborted during processing');
+      this.view.resetSubmitButton();
+      return;
+    }
+
+    this.handleFailedSubmission(error);
   }
 
   /**
