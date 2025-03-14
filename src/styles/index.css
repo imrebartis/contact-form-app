@@ -110,6 +110,10 @@ body {
   position: relative;
   margin-bottom: 1.25rem;
 }
+.contact-form textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+}
 .contact-form input[type=text],
 .contact-form input[type=email],
 .contact-form textarea {
@@ -131,6 +135,12 @@ body {
 .contact-form input[type=email],
 .contact-form textarea {
   width: 100%;
+}
+.contact-form input[type=text]:hover,
+.contact-form input[type=email]:hover,
+.contact-form textarea:hover {
+  border-color: hsl(169, 82%, 27%);
+  cursor: pointer;
 }
 .contact-form input[type=text][aria-invalid=true],
 .contact-form input[type=email][aria-invalid=true],
@@ -154,9 +164,9 @@ body {
 .contact-form input[type=checkbox]:disabled {
   cursor: default;
 }
-.contact-form textarea {
-  min-height: 6.5rem;
-  resize: vertical;
+.contact-form input[type=checkbox]:hover:not(:disabled) {
+  cursor: pointer;
+  border-color: hsl(169, 82%, 27%);
 }
 .contact-form .error-message {
   position: absolute;
@@ -231,7 +241,10 @@ body {
   border: 0.125rem solid hsl(186, 15%, 59%);
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
+}
+.radio-option:focus-within {
+  background-color: hsl(148, 38%, 91%);
+  border: 0.125rem solid hsl(169, 82%, 27%);
 }
 .radio-option.disabled {
   cursor: default;
@@ -255,7 +268,6 @@ body {
   transform: translateY(-50%);
   border: 0.125rem solid hsl(186, 15%, 59%);
   border-radius: 50%;
-  transition: all 0.3s ease;
 }
 .radio-option label::after {
   position: absolute;
@@ -268,7 +280,6 @@ body {
   background: hsl(169, 82%, 27%);
   border-radius: 50%;
   opacity: 0;
-  transition: all 0.3s ease;
 }
 .radio-option input[type=radio] {
   position: absolute;
@@ -285,10 +296,6 @@ body {
 }
 .radio-option input[type=radio]:checked ~ .radio-option {
   border-color: hsl(169, 82%, 27%);
-}
-.radio-option input[type=radio]:focus + label {
-  outline: 0.125rem solid hsl(169, 82%, 27%);
-  outline-offset: 0.125rem;
 }
 .radio-option input[type=radio]:disabled, .radio-option input[type=radio]:disabled + label {
   cursor: default;
@@ -346,5 +353,17 @@ body {
   }
   .contact-form {
     padding: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .radio-option label::before,
+  .radio-option label::after {
+    transition: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .radio-option label::before,
+  .radio-option label::after {
+    transition: all 0.3s ease;
   }
 }

@@ -40,10 +40,20 @@ body {
     margin-bottom: rem(20px);
   }
 
+  textarea {
+    min-height: rem(104px);
+    resize: vertical;
+  }
+
   input[type='text'],
   input[type='email'],
   textarea {
     @include mix.full-width-form-element;
+
+    &:hover {
+      border-color: $primary-color;
+      cursor: pointer;
+    }
 
     &[aria-invalid='true'] {
       border-color: $error-color;
@@ -56,11 +66,11 @@ body {
     &:disabled {
       cursor: default;
     }
-  }
 
-  textarea {
-    min-height: rem(104px);
-    resize: vertical;
+    &:hover:not(:disabled) {
+      cursor: pointer;
+      border-color: $primary-color;
+    }
   }
 
   .error-message {
@@ -133,7 +143,11 @@ body {
   border: rem(2px) solid $grey-500;
   border-radius: $border-radius;
   cursor: pointer;
-  transition: all $transition-duration ease;
+
+  &:focus-within {
+    background-color: $green-200;
+    border: rem(2px) solid $green-600;
+  }
 
   &.disabled {
     cursor: default;
@@ -159,7 +173,6 @@ body {
       transform: translateY(-50%);
       border: rem(2px) solid $grey-500;
       border-radius: 50%;
-      transition: all $transition-duration ease;
     }
 
     &::after {
@@ -173,7 +186,6 @@ body {
       background: $primary-color;
       border-radius: 50%;
       opacity: 0;
-      transition: all $transition-duration ease;
     }
   }
 
@@ -193,11 +205,6 @@ body {
 
     &:checked ~ .radio-option {
       border-color: $primary-color;
-    }
-
-    &:focus + label {
-      outline: rem(2px) solid $primary-color;
-      outline-offset: rem(2px);
     }
 
     &:disabled,
@@ -268,5 +275,19 @@ body {
 
   .contact-form {
     padding: $spacing-unit * 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radio-option label::before,
+  .radio-option label::after {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .radio-option label::before,
+  .radio-option label::after {
+    transition: all $transition-duration ease;
   }
 }
