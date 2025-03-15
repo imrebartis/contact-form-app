@@ -9,8 +9,8 @@ body {
   min-height: 100vh;
   font-family: $font-family;
   line-height: 1.6;
-  background-color: $background-color;
   color: $text-color;
+  background-color: $green-200;
 
   @include mix.flex-center;
 }
@@ -18,7 +18,14 @@ body {
 .container {
   width: 100%;
   max-width: rem(736px);
-  padding: $spacing-unit * 2;
+  padding-inline: rem(12px);
+  padding-block: rem(30px);
+  background-color: $green-200;
+
+  @media (width > $breakpoint-tablet) {
+    padding-inline: $spacing-unit * 3;
+    padding-block: $spacing-unit * 16;
+  }
 }
 
 .contact-form {
@@ -31,18 +38,125 @@ body {
   h1 {
     margin-bottom: $spacing-unit * 4;
     font-size: $font-size-h1;
-    text-align: center;
     color: $secondary-color;
   }
 
   .form-group {
     position: relative;
-    margin-bottom: rem(20px);
+    margin-bottom: rem(26px);
+
+    .form-label {
+      display: block;
+      margin-bottom: rem(4px);
+    }
+  }
+
+  .radio-option {
+    position: relative;
+    padding: $spacing-unit * 1.5;
+    border: rem(1px) solid $grey-500;
+    border-radius: $border-radius;
+    cursor: pointer;
+
+    &:focus-within {
+      border: rem(1px) solid $green-600;
+      background-color: $green-200;
+    }
+
+    &.disabled {
+      cursor: default;
+    }
+
+    &:hover:not(.disabled) {
+      border-color: $primary-color;
+    }
+
+    label {
+      position: relative;
+      display: block;
+      padding-left: rem(42px);
+      cursor: pointer;
+
+      &::before {
+        position: absolute;
+        top: 50%;
+        left: rem(16px);
+        width: rem(20px);
+        height: rem(20px);
+        transform: translateY(-50%);
+        border: rem(1px) solid $grey-500;
+        border-radius: 50%;
+        content: '';
+      }
+
+      &::after {
+        position: absolute;
+        top: 50%;
+        left: rem(20px);
+        width: rem(12px);
+        height: rem(12px);
+        transform: translateY(-50%);
+        background: $primary-color;
+        border-radius: 50%;
+        opacity: 0;
+        content: '';
+      }
+    }
+
+    input[type='radio'] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+
+      &:checked + label {
+        color: $primary-color;
+      }
+
+      &:checked ~ .radio-option {
+        border-color: $primary-color;
+      }
+
+      &:disabled,
+      &:disabled + label {
+        cursor: default;
+      }
+    }
+
+    input[type='radio']:checked + label::before {
+      border-color: $primary-color;
+    }
+
+    input[type='radio']:checked + label::after {
+      opacity: 1;
+    }
   }
 
   textarea {
-    min-height: rem(104px);
+    min-height: rem(238px);
+    vertical-align: top;
     resize: vertical;
+
+    @media (width > $breakpoint-tablet) {
+      min-height: rem(130px);
+    }
+  }
+
+  @media (width > $breakpoint-tablet) {
+    padding: $spacing-unit * 5;
+
+    .name-fields-container {
+      display: flex;
+      gap: $spacing-unit * 2;
+
+      .form-group {
+        flex: 1;
+      }
+    }
   }
 
   input[type='text'],
@@ -68,18 +182,18 @@ body {
     }
 
     &:hover:not(:disabled) {
-      cursor: pointer;
       border-color: $primary-color;
+      cursor: pointer;
     }
   }
 
   .error-message {
     position: absolute;
-    bottom: rem(-20px);
+    bottom: rem(-24px);
     left: 0;
+    display: none;
     font-size: rem(14px);
     color: $error-color;
-    display: none;
 
     &.error-visible {
       display: block;
@@ -87,11 +201,12 @@ body {
   }
 
   button {
-    @include mix.full-width-form-element;
+    @include mix.full-width-form-element(false);
 
     /* stylelint-disable-next-line no-duplicate-selectors */
     & {
       margin-top: $spacing-unit * 2;
+      border: none;
       font-weight: 700;
       background-color: $primary-color;
       color: $white;
@@ -110,6 +225,9 @@ body {
   }
 
   .checkbox-container {
+    display: flex;
+    gap: $spacing-unit;
+
     .error-message {
       position: absolute;
       bottom: rem(-20px);
@@ -134,91 +252,21 @@ body {
   &.disabled legend {
     cursor: default;
   }
-}
 
-.radio-option {
-  position: relative;
-  margin-bottom: $spacing-unit;
-  padding: $spacing-unit * 1.5;
-  border: rem(2px) solid $grey-500;
-  border-radius: $border-radius;
-  cursor: pointer;
-
-  &:focus-within {
-    background-color: $green-200;
-    border: rem(2px) solid $green-600;
+  .radio-options-container {
+    display: flex;
+    flex-flow: column;
+    gap: $spacing-unit * 2;
   }
 
-  &.disabled {
-    cursor: default;
-  }
+  @media (width > $breakpoint-tablet) {
+    .radio-options-container {
+      flex-flow: row;
 
-  &:hover:not(.disabled) {
-    border-color: $primary-color;
-  }
-
-  label {
-    position: relative;
-    display: block;
-    padding-left: $spacing-unit * 3;
-    cursor: pointer;
-
-    &::before {
-      position: absolute;
-      top: 50%;
-      left: rem(2px);
-      width: rem(20px);
-      height: rem(20px);
-      content: '';
-      transform: translateY(-50%);
-      border: rem(2px) solid $grey-500;
-      border-radius: 50%;
+      .radio-option {
+        flex: 1;
+      }
     }
-
-    &::after {
-      position: absolute;
-      top: 50%;
-      left: rem(6px);
-      width: rem(12px);
-      height: rem(12px);
-      content: '';
-      transform: translateY(-50%);
-      background: $primary-color;
-      border-radius: 50%;
-      opacity: 0;
-    }
-  }
-
-  input[type='radio'] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    cursor: pointer;
-    opacity: 0;
-
-    &:checked + label {
-      color: $primary-color;
-    }
-
-    &:checked ~ .radio-option {
-      border-color: $primary-color;
-    }
-
-    &:disabled,
-    &:disabled + label {
-      cursor: default;
-    }
-  }
-
-  input[type='radio']:checked + label::before {
-    border-color: $primary-color;
-  }
-
-  input[type='radio']:checked + label::after {
-    opacity: 1;
   }
 }
 
@@ -236,9 +284,9 @@ body {
   align-items: start;
 
   .toastify-avatar {
+    grid-area: avatar;
     width: rem(24px);
     height: rem(24px);
-    grid-area: avatar;
     margin: 0;
   }
 
@@ -265,16 +313,6 @@ body {
   to {
     transform: translateY(0);
     opacity: 1;
-  }
-}
-
-@media (width <= 768px) {
-  .container {
-    padding: $spacing-unit;
-  }
-
-  .contact-form {
-    padding: $spacing-unit * 2;
   }
 }
 

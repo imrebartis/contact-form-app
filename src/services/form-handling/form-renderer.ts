@@ -9,38 +9,40 @@ export class FormRenderer implements IFormRenderer {
         <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
           <h1>Contact Us</h1>
 
-          <div class="form-group">
-            <label for="first-name">
-              <span class="label-text">First Name&nbsp;</span>
-              <span class="required" aria-hidden="true">*</span>
-            </label>
-            <input
-              type="text"
-              id="first-name"
-              name="first-name"
-              aria-required="true"
-              aria-describedby="first-name-error"
-            >
-            <span id="first-name-error" class="error-message" role="alert"></span>
+          <div class="name-fields-container">
+            <div class="form-group">
+              <label class="form-label" for="first-name">
+                <span class="label-text">First Name&nbsp;</span>
+                <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                type="text"
+                id="first-name"
+                name="first-name"
+                aria-required="true"
+                aria-describedby="first-name-error"
+              >
+              <span id="first-name-error" class="error-message" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="last-name">
+                <span class="label-text">Last Name&nbsp;</span>
+                <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                type="text"
+                id="last-name"
+                name="last-name"
+                aria-required="true"
+                aria-describedby="last-name-error"
+              >
+              <span id="last-name-error" class="error-message" role="alert"></span>
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="last-name">
-              <span class="label-text">Last Name&nbsp;</span>
-              <span class="required" aria-hidden="true">*</span>
-            </label>
-            <input
-              type="text"
-              id="last-name"
-              name="last-name"
-              aria-required="true"
-              aria-describedby="last-name-error"
-            >
-            <span id="last-name-error" class="error-message" role="alert"></span>
-          </div>
-
-          <div class="form-group">
-            <label for="email">
+            <label class="form-label" for="email">
               <span class="label-text">Email Address&nbsp;</span>
               <span class="required" aria-hidden="true">*</span>
             </label>
@@ -60,32 +62,34 @@ export class FormRenderer implements IFormRenderer {
                 <span class="label-text" id="query-type-label">Query Type&nbsp;</span>
                 <span class="required" aria-hidden="true">*</span>
               </legend>
-              <div class="radio-option" id="radio-option-general">
-                <input
-                  type="radio"
-                  id="query-general"
-                  name="query-type"
-                  value="general"
-                  aria-describedby="query-type-error"
-                >
-                <label for="query-general">General Enquiry</label>
-              </div>
-              <div class="radio-option" id="radio-option-support">
-                <input
-                  type="radio"
-                  id="query-support"
-                  name="query-type"
-                  value="support"
-                  aria-describedby="query-type-error"
-                >
-                <label for="query-support">Support Request</label>
+              <div class="radio-options-container">
+                <div class="radio-option" id="radio-option-general">
+                  <input
+                    type="radio"
+                    id="query-general"
+                    name="query-type"
+                    value="general"
+                    aria-describedby="query-type-error"
+                  >
+                  <label for="query-general">General Enquiry</label>
+                </div>
+                <div class="radio-option" id="radio-option-support">
+                  <input
+                    type="radio"
+                    id="query-support"
+                    name="query-type"
+                    value="support"
+                    aria-describedby="query-type-error"
+                  >
+                  <label for="query-support">Support Request</label>
+                </div>
               </div>
               <span id="query-type-error" class="error-message" role="alert"></span>
             </fieldset>
           </div>
 
           <div class="form-group">
-            <label for="message">
+            <label class="form-label" for="message">
               <span class="label-text">Message&nbsp;</span>
               <span class="required" aria-hidden="true">*</span>
             </label>

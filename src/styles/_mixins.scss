@@ -11,17 +11,24 @@
 @mixin input-focus {
   border-color: $primary-color;
   outline: none;
-  box-shadow: 0 0 0 2px rgba($green-200, 0.5);
+  box-shadow: 0 0 0 1px rgba($green-200, 0.5);
 }
 
 @mixin button-hover {
-  transform: translateY(-1px);
   background-color: color.adjust($primary-color, $lightness: -5%);
+
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(-1px);
+  }
 }
 
-@mixin base-form-element {
+@mixin base-form-element($include-border: true) {
   padding: $spacing-unit * 1.5;
-  border: 2px solid $grey-500;
+
+  @if $include-border {
+    border: 1px solid $grey-500;
+  }
+
   border-radius: $border-radius;
   font-family: $font-family;
   font-size: $font-size-base;
@@ -32,8 +39,8 @@
   }
 }
 
-@mixin full-width-form-element {
-  @include base-form-element;
+@mixin full-width-form-element($include-border: true) {
+  @include base-form-element($include-border);
 
   & {
     width: 100%;
