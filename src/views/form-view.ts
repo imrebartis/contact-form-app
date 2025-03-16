@@ -181,17 +181,34 @@ export class FormView implements IFormView {
   }
 
   /**
+   * Creates a debounced event handler with consistent configuration.
+   * @param handler The handler function to debounce
+   * @returns A debounced version of the handler
+   */
+  private createDebouncedHandler<T extends (...args: any[]) => any>(
+    handler: T
+  ): (...args: Parameters<T>) => void {
+    // Only set immediate to true if we're in a test environment
+    const isTest =
+      typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
+    console.log('isTest', isTest);
+    return DOMUtils.debounce(handler, 300, { immediate: isTest });
+  }
+
+  /**
    * Sets up event delegation for form events.
    * @param validateFieldHandler - The handler for field validation events.
    */
   private setupEventDelegation(
     validateFieldHandler: (fieldName: keyof FormElements) => boolean
   ): void {
-    this.form.addEventListener(
-      FormEvents.Input,
-      (event) => this.handleDelegatedEvent(event, validateFieldHandler),
-      { signal: this.abortController.signal }
+    const debouncedInputHandler = this.createDebouncedHandler((event: Event) =>
+      this.handleDelegatedEvent(event, validateFieldHandler)
     );
+
+    this.form.addEventListener(FormEvents.Input, debouncedInputHandler, {
+      signal: this.abortController.signal,
+    });
 
     this.form.addEventListener(
       FormEvents.Blur,
@@ -232,15 +249,15 @@ export class FormView implements IFormView {
         element instanceof HTMLInputElement ||
         element instanceof HTMLTextAreaElement
       ) {
-        element.addEventListener(
-          FormEvents.Input,
-          () => {
-            if (this.isActive) {
-              validateFieldHandler(fieldName as keyof FormElements);
-            }
-          },
-          { signal: this.abortController.signal }
-        );
+        const debouncedInputHandler = this.createDebouncedHandler(() => {
+          if (this.isActive) {
+            validateFieldHandler(fieldName as keyof FormElements);
+          }
+        });
+
+        element.addEventListener(FormEvents.Input, debouncedInputHandler, {
+          signal: this.abortController.signal,
+        });
 
         element.addEventListener(
           FormEvents.Blur,

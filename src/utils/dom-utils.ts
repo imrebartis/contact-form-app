@@ -226,4 +226,30 @@ export class DOMUtils {
       errorElement.classList.add('error-hidden');
     }
   }
+
+  static debounce<T extends (...args: any[]) => any>(
+    func: T,
+    wait: number,
+    options: { immediate?: boolean } = {}
+  ): (...args: Parameters<T>) => void {
+    let timeout: number | undefined;
+
+    return function (this: any, ...args: Parameters<T>): void {
+      const context = this;
+
+      // If immediate is set, execute immediately
+      if (options.immediate) {
+        func.apply(context, args);
+        return;
+      }
+
+      const later = function () {
+        timeout = undefined;
+        func.apply(context, args);
+      };
+
+      clearTimeout(timeout);
+      timeout = window.setTimeout(later, wait) as unknown as number;
+    };
+  }
 }
