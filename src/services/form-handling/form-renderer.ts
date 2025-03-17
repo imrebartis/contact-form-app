@@ -57,7 +57,7 @@ export class FormRenderer implements IFormRenderer {
           </div>
 
           <div class="form-group">
-            <fieldset class="radio-group" aria-required="true" aria-describedby="query-type-error">
+            <fieldset class="radio-group" aria-describedby="query-type-error">
               <legend id="label-legend">
                 <span class="label-text" id="query-type-label">Query Type&nbsp;</span>
                 <span class="required" aria-hidden="true">*</span>
@@ -69,6 +69,7 @@ export class FormRenderer implements IFormRenderer {
                     id="query-general"
                     name="query-type"
                     value="general"
+                    aria-required="true"
                     aria-describedby="query-type-error"
                   >
                   <label for="query-general">General Enquiry</label>
@@ -79,6 +80,7 @@ export class FormRenderer implements IFormRenderer {
                     id="query-support"
                     name="query-type"
                     value="support"
+                    aria-required="true"
                     aria-describedby="query-type-error"
                   >
                   <label for="query-support">Support Request</label>
