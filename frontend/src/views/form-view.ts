@@ -191,7 +191,6 @@ export class FormView implements IFormView {
     // Only set immediate to true if we're in a test environment
     const isTest =
       typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
-    console.log('isTest', isTest);
     return DOMUtils.debounce(handler, 300, { immediate: isTest });
   }
 

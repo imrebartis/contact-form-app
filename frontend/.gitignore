@@ -12,11 +12,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-coverage
 *.local
 tsconfig.tsbuildinfo
 memory-bank
-.cursor
 
 # Editor directories and files
 .vscode/*
@@ -28,4 +26,3 @@ memory-bank
 *.njsproj
 *.sln
 *.sw?
-.vercel

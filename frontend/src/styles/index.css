@@ -66,19 +66,19 @@ h6 {
 
 @font-face {
   font-family: Karla;
-  src: url("../assets/fonts/static/Karla-Regular.ttf") format("truetype");
+  src: url('../assets/fonts/static/Karla-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
   font-family: Karla;
-  src: url("../assets/fonts/static/Karla-Bold.ttf") format("truetype");
+  src: url('../assets/fonts/static/Karla-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
 }
 body {
   min-height: 100vh;
-  font-family: "Karla", sans-serif;
+  font-family: 'Karla', sans-serif;
   line-height: 1.6;
   color: hsl(0, 0%, 20%);
   background-color: hsl(148, 38%, 91%);
@@ -153,7 +153,7 @@ body {
   transform: translateY(-50%);
   border: 0.0625rem solid hsl(186, 15%, 59%);
   border-radius: 50%;
-  content: "";
+  content: '';
 }
 .contact-form .radio-option label::after {
   position: absolute;
@@ -165,9 +165,9 @@ body {
   background: hsl(169, 82%, 27%);
   border-radius: 50%;
   opacity: 0;
-  content: "";
+  content: '';
 }
-.contact-form .radio-option input[type=radio] {
+.contact-form .radio-option input[type='radio'] {
   position: absolute;
   top: 0;
   left: 0;
@@ -177,19 +177,20 @@ body {
   opacity: 0;
   cursor: pointer;
 }
-.contact-form .radio-option input[type=radio]:checked + label {
+.contact-form .radio-option input[type='radio']:checked + label {
   color: hsl(169, 82%, 27%);
 }
-.contact-form .radio-option input[type=radio]:checked ~ .radio-option {
+.contact-form .radio-option input[type='radio']:checked ~ .radio-option {
   border-color: hsl(169, 82%, 27%);
 }
-.contact-form .radio-option input[type=radio]:disabled, .contact-form .radio-option input[type=radio]:disabled + label {
+.contact-form .radio-option input[type='radio']:disabled,
+.contact-form .radio-option input[type='radio']:disabled + label {
   cursor: default;
 }
-.contact-form .radio-option input[type=radio]:checked + label::before {
+.contact-form .radio-option input[type='radio']:checked + label::before {
   border-color: hsl(169, 82%, 27%);
 }
-.contact-form .radio-option input[type=radio]:checked + label::after {
+.contact-form .radio-option input[type='radio']:checked + label::after {
   opacity: 1;
 }
 .contact-form textarea {
@@ -214,57 +215,57 @@ body {
     flex: 1;
   }
 }
-.contact-form input[type=text],
-.contact-form input[type=email],
+.contact-form input[type='text'],
+.contact-form input[type='email'],
 .contact-form textarea {
   padding: 12px;
   border: 1px solid hsl(186, 15%, 59%);
   border-radius: 8px;
-  font-family: "Karla", sans-serif;
+  font-family: 'Karla', sans-serif;
   font-size: 16px;
   transition: all 0.3s ease;
 }
-.contact-form input[type=text]:focus,
-.contact-form input[type=email]:focus,
+.contact-form input[type='text']:focus,
+.contact-form input[type='email']:focus,
 .contact-form textarea:focus {
   border-color: hsl(169, 82%, 27%);
   outline: none;
   box-shadow: 0 0 0 1px rgba(223.329, 240.771, 231.4686, 0.5);
 }
-.contact-form input[type=text],
-.contact-form input[type=email],
+.contact-form input[type='text'],
+.contact-form input[type='email'],
 .contact-form textarea {
   width: 100%;
 }
-.contact-form input[type=text]:hover,
-.contact-form input[type=email]:hover,
+.contact-form input[type='text']:hover,
+.contact-form input[type='email']:hover,
 .contact-form textarea:hover {
   border-color: hsl(169, 82%, 27%);
   cursor: pointer;
 }
-.contact-form input[type=text][aria-invalid=true],
-.contact-form input[type=email][aria-invalid=true],
-.contact-form textarea[aria-invalid=true] {
+.contact-form input[type='text'][aria-invalid='true'],
+.contact-form input[type='email'][aria-invalid='true'],
+.contact-form textarea[aria-invalid='true'] {
   border-color: hsl(0, 66%, 54%);
 }
-.contact-form input[type=checkbox] {
+.contact-form input[type='checkbox'] {
   padding: 12px;
   border: 1px solid hsl(186, 15%, 59%);
   border-radius: 8px;
-  font-family: "Karla", sans-serif;
+  font-family: 'Karla', sans-serif;
   font-size: 16px;
   transition: all 0.3s ease;
   cursor: pointer;
 }
-.contact-form input[type=checkbox]:focus {
+.contact-form input[type='checkbox']:focus {
   border-color: hsl(169, 82%, 27%);
   outline: none;
   box-shadow: 0 0 0 1px rgba(223.329, 240.771, 231.4686, 0.5);
 }
-.contact-form input[type=checkbox]:disabled {
+.contact-form input[type='checkbox']:disabled {
   cursor: default;
 }
-.contact-form input[type=checkbox]:hover:not(:disabled) {
+.contact-form input[type='checkbox']:hover:not(:disabled) {
   border-color: hsl(169, 82%, 27%);
   cursor: pointer;
 }
@@ -282,7 +283,7 @@ body {
 .contact-form button {
   padding: 12px;
   border-radius: 8px;
-  font-family: "Karla", sans-serif;
+  font-family: 'Karla', sans-serif;
   font-size: 16px;
   transition: all 0.3s ease;
   /* stylelint-disable-next-line no-duplicate-selectors */
@@ -362,7 +363,7 @@ body {
 .toast-success {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-areas: "avatar title" "content content";
+  grid-template-areas: 'avatar title' 'content content';
   gap: 0.25rem 8px;
   align-items: start;
 }

@@ -1,0 +1,20 @@
+{
+  "root": [
+    "./src/index.ts",
+    "./src/api/form-submissions.ts",
+    "./src/controllers/form-submission.controller.ts",
+    "./src/migrations/0250319_00_add_query_type_to_form_submissions.ts",
+    ".src/migrations/20250322_00_create_form_submissions_table.ts",
+    "./src/models/form-submission.ts",
+    "./src/services/form-submission.service.ts",
+    "./src/types/form-data.ts",
+    "./src/types/migration.ts",
+    "./src/util/config.ts",
+    "./src/util/db.ts",
+    "./src/util/rollback-migrations.ts",
+    "./src/util/run-migrations.ts",
+    "./src/validators/form-submission.validators.ts"
+  ],
+  "errors": true,
+  "version": "5.8.2"
+}
