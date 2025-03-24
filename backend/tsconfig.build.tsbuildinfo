@@ -1,0 +1,24 @@
+{
+  "root": [
+    "./src/index.ts",
+    "./src/api/form-submissions.ts",
+    "./src/controllers/form-submission.controller.ts",
+    "./src/middleware/auth.middleware.ts",
+    "./src/migrations/20250319_00_create_form_submissions_table.ts",
+    "./src/models/form-submission.ts",
+    "./src/models/user.model.ts",
+    "./src/services/form-submission.service.ts",
+    "./src/types/form-submission-repository.ts",
+    "./src/types/form-submission-schema.ts",
+    "./src/types/migration.ts",
+    "./src/types/user.ts",
+    "./src/util/config.ts",
+    "./src/util/db.ts",
+    "./src/util/passport.ts",
+    "./src/util/rollback-migrations.ts",
+    "./src/util/run-migrations.ts",
+    "./src/util/session.ts"
+  ],
+  "errors": true,
+  "version": "5.8.2"
+}

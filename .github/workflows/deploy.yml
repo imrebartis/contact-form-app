@@ -45,13 +45,16 @@ jobs:
         run: pnpm run lint
 
       - name: Run Stylelint
-        run: pnpm run lint:sass
+        run: cd frontend && pnpm run lint:sass
 
       - name: Type check
-        run: pnpm run ts-check
+        run: |
+          echo "Running TypeScript checks with configuration:"
+          cd backend && echo "Backend:" && cat tsconfig.json && pnpm run ts-check
+          cd ../frontend && echo "Frontend:" && cat tsconfig.json && pnpm run ts-check
 
       - name: Run tests
-        run: pnpm test:run
+        run: pnpm run test:run
 
   build-and-deploy:
     needs: lint-and-test
@@ -88,14 +91,18 @@ jobs:
         run: pnpm install
 
       - name: Build noscript styles
-        run: pnpm run build:noscript
+        run: cd frontend && pnpm run build:noscript
 
       - name: Build project
-        run: pnpm run build
+        run: |
+          pnpm run build
+          echo "Verifying build output structure:"
+          find backend/dist -type f | sort
+          find backend/public -type f | sort
 
       - name: Deploy to GitHub Pages
         if: success()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./backend/public

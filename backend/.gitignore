@@ -8,15 +8,15 @@ pnpm-debug.log*
 lerna-debug.log*
 
 .env
+.env.development
+.env.test
+.env.production
+database.sqlite
 
 node_modules
-dist
 dist-ssr
-coverage
 *.local
-tsconfig.tsbuildinfo
-memory-bank
-.cursor
+**/node_modules/
 
 # Editor directories and files
 .vscode/*
@@ -28,9 +28,10 @@ memory-bank
 *.njsproj
 *.sln
 *.sw?
-.vercel
 
-.windsurfrules
-scripts/
-tasks/
-.qodo
+config
+dist
+public
+
+memory
+database.sqlite

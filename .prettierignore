@@ -1,3 +1,4 @@
+# Base ignore patterns
 *.html
 *.md
 *.css
@@ -8,3 +9,33 @@
 .prettierrc
 node_modules
 dist
+
+# All build directories
+dist/
+build/
+public/
+**/dist/
+**/build/
+**/public/
+
+# Specific paths for backend assets
+backend/public/
+backend/public/dist/
+backend/public/dist/assets/
+backend/public/dist/assets/*.js
+
+# Vendor files (use absolute patterns)
+**/vendor-*.js
+vendor-*.js
+**/assets/vendor-*.js
+**/public/dist/assets/vendor-*.js
+backend/public/dist/assets/vendor-*.js
+
+# Wildcards for generated files
+**/*.min.js
+**/*.bundle.js
+**/*.generated.js
+
+# Node modules
+node_modules/
+**/node_modules/

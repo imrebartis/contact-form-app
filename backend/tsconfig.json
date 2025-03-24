@@ -1,0 +1,39 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "../../",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "sourceMap": true,
+    "removeComments": true,
+    "paths": {
+      "*": [
+        "*",
+        "*.ts"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "baseUrl": "./",
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "public"
+  ],
+  "ts-node": {
+    "transpileOnly": true
+  }
+}
