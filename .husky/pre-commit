@@ -1,1 +1,1 @@
-pnpm lint-staged && tsc --noEmit && pnpm test:run
+pnpm run ts-check && pnpm run test:run && cd frontend && pnpm lint:sass
