@@ -4,6 +4,7 @@ import { Router } from 'express';
 
 import * as formSubmissionController from '../controllers/form-submission.controller';
 import { authenticate, requireAdmin } from '../middleware/auth.middleware';
+import { validateFormSubmission } from '../middleware/validation.middleware';
 
 const router: Router = Router();
 
@@ -14,7 +15,11 @@ router.get(
   requireAdmin,
   formSubmissionController.getAllSubmissions
 );
-router.post('/', formSubmissionController.createSubmission);
+router.post(
+  '/',
+  validateFormSubmission,
+  formSubmissionController.createSubmission
+);
 // Protected route - only admin can delete submissions
 router.delete(
   '/:id',

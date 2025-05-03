@@ -1,11 +1,8 @@
 'use strict';
 
-import * as yup from 'yup';
-
 import formSubmissionService from '../services/form-submission.service';
 import { Request, Response } from '../types/express';
 import { FormSubmissionRepository } from '../types/form-submission-repository';
-import { formSubmissionSchema } from '../util/validation';
 
 const sanitizeText = (text: string): string => {
   // Escape HTML special characters
@@ -23,27 +20,16 @@ export const createSubmissionFactory = (
 ) => {
   return async (req: Request, res: Response) => {
     try {
+      // Data is already validated by middleware
       const submissionData = req.body.submission || req.body;
-
-      // Validate using Yup
-      const validatedData = await formSubmissionSchema.validate(
-        submissionData,
-        {
-          abortEarly: false,
-        }
-      );
-
-      // Ensure the name field is present and properly formatted
-      const firstName = sanitizeText(validatedData.firstName);
-      const lastName = sanitizeText(validatedData.lastName);
 
       // Sanitize the validated data
       const sanitizedData = {
-        firstName,
-        lastName,
-        email: sanitizeText(validatedData.email),
-        message: sanitizeText(validatedData.message),
-        queryType: sanitizeText(validatedData.queryType),
+        firstName: sanitizeText(submissionData.firstName),
+        lastName: sanitizeText(submissionData.lastName),
+        email: sanitizeText(submissionData.email),
+        message: sanitizeText(submissionData.message),
+        queryType: sanitizeText(submissionData.queryType),
       };
 
       // Create the submission using sanitized data
@@ -51,16 +37,6 @@ export const createSubmissionFactory = (
       return res.status(201).json(result);
     } catch (error: unknown) {
       console.error('Error creating submission:', error);
-
-      if (error instanceof yup.ValidationError) {
-        return res.status(400).json({
-          error: 'Validation failed',
-          details: error.inner.map((err) => ({
-            path: err.path,
-            message: err.message,
-          })),
-        });
-      }
 
       return res.status(500).json({
         error: 'Failed to create submission',
