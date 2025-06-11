@@ -1,17 +1,17 @@
 'use strict';
 
+import sanitizeHtml from 'sanitize-html';
+
 import formSubmissionService from '../services/form-submission.service';
 import { Request, Response } from '../types/express';
 import { FormSubmissionRepository } from '../types/form-submission-repository';
 
+// Replace sanitizeText with sanitizeHtml for robust sanitization
 const sanitizeText = (text: string): string => {
-  // Escape HTML special characters
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return sanitizeHtml(text, {
+    allowedTags: [], // Remove all HTML tags
+    allowedAttributes: {},
+  });
 };
 
 // Factory function that returns a controller with the service injected
