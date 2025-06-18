@@ -20,12 +20,20 @@ export const validateFormSubmission = (
     if (error instanceof Error && 'errors' in error) {
       res.status(400).json({
         success: false,
-        errors: (error as { errors: string[] }).errors,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: (error as { errors: string[] }).errors,
+        },
       });
     } else {
       res.status(400).json({
         success: false,
-        errors: ['Validation failed'],
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: ['Validation failed'],
+        },
       });
     }
   }

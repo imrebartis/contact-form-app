@@ -566,9 +566,7 @@ describe('ContactForm State Transitions', () => {
     await submitPromise.catch(() => {}); // Handle the rejection
 
     // Final state - error flow
-    expect(viewSpies.showFormError).toHaveBeenCalledWith(
-      'Failed to send message. Please try again.'
-    );
+    expect(viewSpies.showFormError).toHaveBeenCalledWith('Network error');
     expect(viewSpies.resetSubmitButton).toHaveBeenCalledTimes(1);
 
     // Success state methods should never be called

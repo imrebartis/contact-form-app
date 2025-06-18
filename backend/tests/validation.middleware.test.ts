@@ -123,7 +123,11 @@ describe('validateFormSubmission middleware', () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        errors: expect.any(Array),
+        error: expect.objectContaining({
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: expect.any(Array),
+        }),
       })
     );
   });

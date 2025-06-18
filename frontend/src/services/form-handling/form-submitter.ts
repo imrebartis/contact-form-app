@@ -5,6 +5,7 @@ import {
   IToastService,
 } from '../../interfaces/form-interfaces';
 import { FormData } from '../../types/form.types';
+import { parseApiError } from '../../utils/api-error';
 
 /**
  * Handles form submission operations and success notifications
@@ -90,9 +91,8 @@ export class FormSubmitter implements IFormSubmitter {
             });
 
             if (!response.ok) {
-              const errorText = await response.text();
-              console.error('API error response:', errorText);
-              throw new Error(`API error: ${response.status} - ${errorText}`);
+              const errorMessage = await parseApiError(response);
+              throw new Error(errorMessage);
             }
 
             resolve(null);

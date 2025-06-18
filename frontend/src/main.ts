@@ -210,13 +210,20 @@ export class ContactForm {
    * @param error - Optional error object from submission failure
    */
   protected handleFailedSubmission(error?: unknown): void {
-    if (error instanceof Error) {
-      console.error(error.message);
-    } else {
-      console.error('An unknown error occurred.');
+    let message = 'Failed to send message. Please try again.';
+    if (error instanceof Error && error.message) {
+      if (
+        error.message === 'Failed to fetch' ||
+        error.message.includes('NetworkError') ||
+        error.message.includes('Network request failed')
+      ) {
+        message =
+          'Unable to connect to the server. Please check your internet connection or try again later.';
+      } else {
+        message = error.message;
+      }
     }
-
-    this.view.showFormError('Failed to send message. Please try again.');
+    this.view.showFormError(message);
     this.view.resetSubmitButton();
   }
 }

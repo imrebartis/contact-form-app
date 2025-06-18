@@ -445,14 +445,24 @@ describe('LandingPage', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
+      // Mock a failed Response with status and statusText
       fetchMock.mockResolvedValueOnce({
         ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        json: async () => ({
+          error: { message: 'Logout failed', details: 'Session expired' },
+        }),
+        text: async () => '',
+        clone() {
+          return this;
+        },
       });
 
       await (landingPage as any).handleLogout();
 
       expect(SpinnerUtils.showSpinner).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to log out');
+      expect(consoleSpy).toHaveBeenCalledWith('Logout failed: Session expired');
       expect(SpinnerUtils.hideSpinner).toHaveBeenCalled();
     });
   });
@@ -514,16 +524,16 @@ describe('LandingPage', () => {
         status: 500,
         statusText: 'Server Error',
         text: vi.fn().mockResolvedValueOnce('Internal Server Error'),
+        clone() {
+          return this;
+        },
       });
 
       const result = await (landingPage as any).checkAuthStatus();
 
       expect(result).toEqual({ isAuthenticated: false });
       expect(consoleSpy).toHaveBeenCalledWith(
-        'Auth status request failed with status: 500 Server Error'
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Error response body:',
+        'API error:',
         'Internal Server Error'
       );
     });

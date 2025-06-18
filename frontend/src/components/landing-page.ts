@@ -1,6 +1,7 @@
 'use strict';
 
 import { IUser } from '../../../shared/types/user';
+import { parseApiError } from '../utils/api-error';
 import { AuthStorage } from '../utils/auth-storage';
 import { DOMUtils } from '../utils/dom-utils';
 import { Router } from '../utils/router';
@@ -86,15 +87,8 @@ export class LandingPage {
         });
 
         if (!response.ok) {
-          console.error(
-            `Auth status request failed with status: ${response.status} ${response.statusText}`
-          );
-          try {
-            const errorText = await response.text();
-            console.error('Error response body:', errorText);
-          } catch (textError) {
-            console.error('Could not read error response text:', textError);
-          }
+          const errorMessage = await parseApiError(response);
+          console.error('API error:', errorMessage);
           return { isAuthenticated: false };
         }
 
@@ -242,12 +236,12 @@ export class LandingPage {
 
       if (response.ok) {
         AuthStorage.clearAuthData();
-
         window.history.pushState({}, '', '/');
         Router.getInstance().setCurrentPath('/');
         window.location.reload();
       } else {
-        console.error('Failed to log out');
+        const errorMessage = await parseApiError(response);
+        console.error(errorMessage);
         SpinnerUtils.hideSpinner();
       }
     } catch (error) {

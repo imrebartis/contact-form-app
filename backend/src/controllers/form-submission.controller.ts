@@ -37,10 +37,13 @@ export const createSubmissionFactory = (
       return res.status(201).json(result);
     } catch (error: unknown) {
       console.error('Error creating submission:', error);
-
       return res.status(500).json({
-        error: 'Failed to create submission',
-        details: error instanceof Error ? error.message : String(error),
+        success: false,
+        error: {
+          code: 'SUBMISSION_CREATE_ERROR',
+          message: 'Failed to create submission',
+          details: error instanceof Error ? error.message : String(error),
+        },
       });
     }
   };
@@ -59,8 +62,15 @@ export const getAllSubmissionsFactory = (
     } catch (error) {
       console.error('Error fetching submissions:', error);
       return res.status(500).json({
-        error:
-          error instanceof Error ? error.message : 'An unknown error occurred',
+        success: false,
+        error: {
+          code: 'SUBMISSION_FETCH_ERROR',
+          message: 'Failed to fetch submissions',
+          details:
+            error instanceof Error
+              ? error.message
+              : 'An unknown error occurred',
+        },
       });
     }
   };
@@ -109,8 +119,13 @@ export const deleteSubmission = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting submission:', error);
     return res.status(500).json({
-      error:
-        error instanceof Error ? error.message : 'An unknown error occurred',
+      success: false,
+      error: {
+        code: 'SUBMISSION_DELETE_ERROR',
+        message: 'Failed to delete submission',
+        details:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      },
     });
   }
 };

@@ -17,7 +17,14 @@ export const authenticate = (
   if (req.isAuthenticated()) {
     return next();
   }
-  return res.status(401).json({ error: 'Authentication required' });
+  return res.status(401).json({
+    success: false,
+    error: {
+      code: 'AUTH_REQUIRED',
+      message: 'Authentication required',
+      details: null,
+    },
+  });
 };
 
 // Middleware to check if user is admin
@@ -29,5 +36,12 @@ export const requireAdmin = (
   if (req.isAuthenticated() && req.user && req.user.isAdmin === true) {
     return next();
   }
-  return res.status(403).json({ error: 'Admin privileges required' });
+  return res.status(403).json({
+    success: false,
+    error: {
+      code: 'ADMIN_REQUIRED',
+      message: 'Admin privileges required',
+      details: null,
+    },
+  });
 };
